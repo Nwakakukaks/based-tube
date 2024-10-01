@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperSats</title>
+    <style>
+    .app {
+        text-align: center;
+        vertical-align: center;
+    }
+    
+    *,
+    ::after,
+    ::before {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        background-color: #f7f7f7;
+        color: var(--clr-grey-1);
+        font-size: 0.875rem;
+        background-size: cover;
+        height: 100%;
+    }
+    ul {
+        list-style-type: none;
+    }
+    a {
+        text-decoration: none;
+    }
+    h1,
+    h2, 
+    h3,
+    h4,
+    h1 {
+        color: pink;
+        font-size: 3rem;
+    }
+    h2 {
+        font-size: 2rem;
+    }
+    h3 {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+            Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        font-weight: normal;
+        font-size: 1.5rem;
+        line-height: 2rem;
+        color: #5c5c5c;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    p {
+        margin-bottom: 1.25rem;
+        color: #5c5c5c;
+    }
+    @media screen and (min-width: 800px) {
+        h1 {
+        font-size: 4rem;
+        }
+        h2 {
+        font-size: 2.5rem;
+        }
+        h3 {
+        font-size: 1.75rem;
+        }
+        h4 {
+        font-size: 1rem;
+        }
+        body {
+        font-size: 1rem;
+        }
+        h1,
+        h2,
+        h3,
+        h4 {
+        line-height: 1;
+        }
+    }
+    
+    .grid > * {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .left-column {
+        width: 55%;
+        float: left;
+        text-align: center;
+        height: 100vh;
+        max-height:100%; 
+    }
+    
+    .header-content {
+        padding-top: 35px;
+        padding-bottom: 35px; 
+        width: 80%;
+        text-align: center;
+        margin: 3.5rem auto; 
+    }
+    
+    .main-title {
+        text-align: center;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        font-weight: 800;
+        font-size: 7vw;
+        line-height: 1;
+        padding: 30px 15px 15px 15px;
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-color: #3f0d12;
+        background-image: linear-gradient(to bottom right, #3f0d12, #a71d31);
+    }
+
+    h2 {
+        text-align: center;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        font-weight: 800;
+        font-size: 4vw;
+        line-height: 1;
+        padding: 15px 10px 10px 10px;
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-color: #3f0d12;
+        background-image: linear-gradient(to bottom right, #3f0d12, #a71d31);
+    }
+
+    h3, h4 {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+            Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        font-weight: normal;
+        font-size: 1.5rem;
+        line-height: 2rem;
+        color: #5c5c5c;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .right-column {
+        float: left;
+        width: 45%;
+        min-height: 100vh;
+    }
+    
+    .form-container {
+        padding-top: 35px;
+        padding-bottom: 35px; 
+        width: 80%;
+        text-align: center;
+        margin: 4.5rem auto; 
+        border-radius: 20px;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        background-color: #efecec;
+        background-image: linear-gradient(45deg, #a71d31 0%, #3f0d12 76%);
+        color: #5c5c5c;
+    }
+    
+    .form-container p {
+        margin-top: 1.25rem;
+        padding: 0rem 1.5rem;
+        font-size: 0.9rem;
+        color: silver;
+    }
+
+    .form-container h1 {
+        font-size: 2.5rem;
+        padding: 1.5rem;
+        color:  #a64654;
+    }
+    
+    input {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        outline: 0;
+        border: 1px solid rgba(164, 13, 13, 0.4);
+        background-color: #f7f7f7;
+        width: 80%;
+        border-radius: 3px;
+        padding: 10px 15px;
+        margin: 25px auto 10px auto;
+        display: block;
+        text-align: center;
+        font-size: 16px;
+        
+        transition-duration: 0.25s;
+        font-weight: 300;
+        max-width: 80%; 
+        max-height: 80%;
+    }
+    
+    input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(183, 28, 28, 0.2);
+    }
+
+    .generated-url {
+        margin: 2rem;
+        padding: 2rem;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        word-break: break-all;
+        font-size: 0.9rem;
+        color: #5c5c5c;
+    }
+        
+    .generated-url p {
+        margin: 0;
+        padding: 0;
+        color: silver;
+    }
+
+    .generated-url a {
+        text-decoration: underline;
+        color: black;
+    }
+        
+    .generated-url.link-generated {
+        color: black;
+    }
+
+    .generated-url.link-generated p {
+        color: black;
+    }
+
+    .submit-button {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        outline: 0;
+        background-color: #AA0114;
+        border: 0;
+        padding: 15px 15px;
+        margin-top: 20px;
+        color: white;
+        border-radius: 12px;
+        width: 250px;
+        cursor: pointer;
+        font-size: 18px;
+        transition-duration: 0.25s;
+        background: linear-gradient(to bottom right, #3f0d12, #a71d31, #aaa9ad);
+        background-blend-mode: color-dodge, overlay, difference, difference, normal;
+        background-size: 400% 400%;
+        animation: gradient 8s ease infinite;
+    }
+
+    .submit-button:hover {
+        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+        background-size: 400% 400%;
+        animation: gradient 10s ease infinite;
+    }
+
+    .submit-button:active {
+    transform: scale(0.95);
+}
+
+    @keyframes gradient {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+    
+    @media screen and (max-width: 1024px) and (-webkit-min-device-pixel-ratio: 1) {
+        .right-column {
+            width: 100vw;
+            min-height: auto;
+        }
+    
+        .left-column {
+            width: 100vw;
+            height: auto;
+        }
+    
+        .form-container {
+            width: 80vw;
+        }
+    }
+    
+    @media screen and (max-width: 600px) {
+        .right-column {
+            width: 100%;
+            text-align: center;
+            min-height: auto;
+        }
+    
+        .left-column {
+            width: 100vw;
+            height: auto;
+        }
+    
+        .main-title {
+            font-size: 3rem;
+        } 
+    
+        .form-container {
+            font-size: 0.7rem;
+            width: 92vw;
+            padding: 25px 0px;
+            margin-top: auto;
+        } 
+    }
+
+    .features {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 2rem;
+        text-align: left;
+    }
+
+    .feature {
+        width: 45%;
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 1rem;
+        padding-right: 0;
+        border-radius: 10px;
+        backdrop-filter: blur(5px);
+    }
+
+    .feature h4 {
+        color: #a71d31;
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .feature p {
+        font-size: 0.9rem;
+        color: #333;
+    }
+
+    @media screen and (max-width: 768px) {
+        .features {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .feature {
+            width: 80%;
+            margin-bottom: 1rem;
+        }
+    }
+
+    .analytics-dashboard {
+        padding: 2rem;
+        background-color: var(--card-background);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        margin-top: 2rem;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 400px;
+        width: 100%;
+    }
+
+    .analytics-dashboard .analytics-input-container {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        margin-top: 2rem;
+    }
+
+    .analytics-dashboard .analytics-input-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 45%;
+    }
+
+    .analytics-dashboard .analytics-input-box h3 {
+        margin-bottom: 0.5rem;
+        color: #a71d31;
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .analytics-dashboard .analytics-input-wrapper {
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+
+    .analytics-dashboard .analytics-input-wrapper input {
+        flex: 1;
+        margin-right: 10px;
+    }
+
+    .analytics-dashboard .analytics-input {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        outline: 0;
+        background-color: #f7f7f7;
+        padding: 10px 15px;
+        display: block;
+        text-align: center;
+        font-size: 16px;
+        font-weight: 300;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        width: 100%;
+        transition-duration: 0.25s;
+        margin: 0;
+    }
+
+    .analytics-dashboard .analytics-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(183, 28, 28, 0.2);
+    }
+
+    .analytics-dashboard .analytics-button {
+        background-color: #AA0114;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+    }
+
+    .analytics-dashboard .analytics-button:hover {
+        background-color: #e63a53;
+    }
+
+    .analytics-dashboard .analytics-button:active {
+        transform: scale(0.95);
+    }
+
+    .data-display {
+        background-color: var(--card-background);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 20px;
+        width: 100%;
+        max-width: 800px;
+        height: 400px;
+        overflow-y: auto;
+        margin: 0 auto;
+        margin-top: 20px;
+    }
+
+    .spinner {
+        border: 16px solid #f3f3f3;
+        border-top: 16px solid #AA0114;
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+        animation: spin 2s linear infinite;
+        margin: 0 auto;
+        display: none; /* Initially hidden */
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+</head>
+<body>
+    <div class="app">
+        <div class="grid">
+            <div class="left-column">
+                <div class="header-content">
+                    <h1 class="main-title">SuperSat⚡ </h1>
+                    <h2>Lightning Superchat for Creators</h2>
+                    <h3>Monetize your live streams with Bitcoin Lightning Network. Keep your 30%!</h3>
+                    
+                    <div class="features">
+                        <div class="feature">
+                            <h4>Instant Payments</h4>
+                            <p>Receive payments and superchats in real-time directly in stream using the Lightning Network.</p>
+                        </div>
+                        <div class="feature">
+                            <h4>Easy Setup</h4>
+                            <p>Input your YouTube Live URL and Lightning address, then share the generated link with your viewers on your live.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-column">
+                <div class="form-container">                            
+                    <h1>Create your superchat link</h1>
+                    <p>Generate a unique url and pin it in your live chat</p>
+                    <input type="text" id="video-url" placeholder="Enter your YouTube Live URL" />
+                    <input type="text" id="lightning-address" placeholder="Enter your Lightning address" />
+                    <button class="submit-button" onclick="generateSuperchatUrl()">Generate SuperSat Link</button>
+                    <div id="result" class="generated-url">
+                        <p>Your generated URL will appear here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="analytics-dashboard">
+        <h2>Creator Dashboard</h2>
+        <div class="analytics-input-container">
+            <div class="analytics-input-box">
+                <h3>Live chat data</h3>
+                <p>Start monitoring your live chat to see superchats and payments show up here in real-time, without distractions</p>
+                <div class="analytics-input-wrapper">
+                    <input type="text" id="live-url" class="analytics-input" placeholder="Insert URL">
+                    <button class="analytics-button" onclick="submitLiveUrl()">Submit</button>
+                </div>
+            </div>
+            <div class="analytics-input-box">
+                <h3>Historical chat data</h3>
+                <p>Input your address to see superchats and payments from previou youtube live streams. </p>
+                <div class="analytics-input-wrapper">
+                    <input type="text" id="historical-address" class="analytics-input" placeholder="Insert Address">
+                    <button class="analytics-button" onclick="submitHistoricalAddress()">Submit</button>
+                </div>
+            </div>
+        </div>
+    <div class="spinner" id="loading-spinner"></div>
+        <div class="data-display" id="data-display">
+            <!-- depeneding on what the creator has chosen the data will go here -->
+        </div>
+        <div class="chart-container">
+            <canvas id="superchatChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        function generateSuperchatUrl() {
+            const videoUrl = document.getElementById('video-url').value;
+            const lightningAddress = document.getElementById('lightning-address').value;
+            const videoId = extractVideoId(videoUrl);
+
+            if (videoId && lightningAddress) {
+                fetch('/generate-short-url', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ videoId, lightningAddress }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        if (data.error === 'No live stream found for this video ID') {
+                            alert('No live stream found for this video ID. Please check the video ID and try again.');
+                        } else {
+                            alert(data.error); // Show alert with other error messages
+                        }
+                    } else {
+                        const superchatUrl = `${window.location.origin}/s/${data.shortCode}`;
+                        const resultElement = document.getElementById('result');
+                        resultElement.innerHTML = `
+                            <strong>Your Superchat URL:</strong><br>
+                            Pin this in your YouTube Live chat:<br>
+                            <a href="${superchatUrl}" target="_blank">${superchatUrl}</a>
+                        `;
+                        resultElement.classList.add('link-generated');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('result').textContent = `Error: ${error.message}`;
+                });
+            } else {
+                document.getElementById('result').textContent = 'Invalid input. Please enter a valid YouTube Live URL and Lightning Address.';
+            }
+        }
+
+        function extractVideoId(url) {
+            try {
+                const parsedUrl = new URL(url);
+                const hostname = parsedUrl.hostname;
+
+                if (hostname.includes('youtube.com') || hostname.includes('youtu.be')) {
+                    if (parsedUrl.pathname.startsWith('/live/')) {
+                        // Handle live stream URLs
+                        return parsedUrl.pathname.split('/')[2];
+                    } else if (parsedUrl.searchParams.has('v')) {
+                        // Handle standard YouTube URLs
+                        return parsedUrl.searchParams.get('v');
+                    } else if (hostname === 'youtu.be') {
+                        // Handle shortened URLs
+                        return parsedUrl.pathname.slice(1);
+                    }
+                }
+            } catch (error) {
+                console.error('Error parsing URL:', error);
+            }
+            return null;
+        }
+
+        function submitLiveUrl() {
+            const liveUrl = document.getElementById('live-url').value;
+            const videoId = extractVideoId(liveUrl);
+            if (videoId) {
+                fetch('/start-monitoring', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ videoId }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        alert('Live URL submitted: ' + liveUrl);
+                        showSuperchatsContainer();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error submitting live URL: ' + error.message);
+                });
+            } else {
+                alert('Please enter a valid URL.');
+            }
+        }
+
+        function showSuperchatsContainer() {
+            const container = document.getElementById('data-display');
+            container.style.border = '2px solid black';
+            container.style.borderRadius = '5px';
+            container.style.padding = '10px';
+            container.style.minHeight = '100px'; // Ensures the border is visible even when empty
+        }
+
+        function submitHistoricalAddress() {
+            const historicalAddress = document.getElementById('historical-address').value;
+            if (historicalAddress) {
+                const spinner = document.getElementById('loading-spinner');
+                spinner.style.display = 'block'; // Show spinner
+
+                fetch('/fetch-messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ lightningAddress: historicalAddress }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    spinner.style.display = 'none'; // Hide spinner
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        const dataDisplay = document.getElementById('data-display');
+        dataDisplay.innerHTML = ''; // Clear previous data
+        data.transactions.forEach(transaction => {
+            const newMessage = document.createElement('div');
+            newMessage.innerHTML = `
+                <p><strong>Time:</strong> ${new Date(transaction.timestamp).toLocaleString()}</p>
+                <p><strong>Message:</strong> ${transaction.messageText}</p>
+                <p><strong>Amount:</strong> $${transaction.amountUSD.toFixed(2)} / ${transaction.amountSatoshis} $ATS</p>
+                <hr>
+            `;
+            dataDisplay.appendChild(newMessage);
+        });
+    }
+})
+                .catch(error => {
+                    spinner.style.display = 'none'; // Hide spinner
+                    console.error('Error:', error);
+                    alert('Error fetching messages: ' + error.message);
+                });
+            } else {
+                alert('Please enter a valid address.');
+            }
+        }
+
+        // EventSource client setup
+        const eventSource = new EventSource('/superchat-events');
+        eventSource.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            const dataDisplay = document.getElementById('data-display');
+            const newMessage = document.createElement('div');
+            newMessage.textContent = `Video ID: ${data.videoId}, Message: ${data.messageText}`;
+            dataDisplay.appendChild(newMessage);
+        };
+    </script>
+</body>
+</html>

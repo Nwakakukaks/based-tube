@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting to Superchat</title>
+    <script>
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const videoId = urlParams.get('vid');
+            const lightningAddress = urlParams.get('lnaddr');
+            const popupUrl = `${window.location.origin}/superchat.html?vid=${videoId}&lnaddr=${lightningAddress}`;
+            const popup = window.open(popupUrl, 'Superchat', 'width=400,height=600');
+            if (popup) {
+                window.close();
+            } else {
+                // Fallback for when popups are blocked
+                window.location.href = popupUrl;
+            }
+        };
+    </script>
+</head>
+<body>
+    <p>Redirecting to Superchat...</p>
+</body>
+</html>
