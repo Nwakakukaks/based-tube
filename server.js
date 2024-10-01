@@ -20,11 +20,6 @@ const {
   isValidMessage,
   isSuperchatFormat,
 } = require("./chatbot/messageValidator");
-const {
-  createInvoice,
-  checkInvoiceStatus,
-  app: webappApp,
-} = require("./webapp/index");
 
 dotenv.config();
 const app = express();
@@ -32,14 +27,7 @@ const port = process.env.PORT || 3001; //why isnt 3000 working????
 
 app.use(express.json()); //  parse JSON in request body
 
-const lightsparkClient = new LightsparkClient(
-  new AccountTokenAuthProvider(
-    process.env.LIGHTSPARK_API_TOKEN_ID,
-    process.env.LIGHTSPARK_API_TOKEN_SECRET
-  )
-);
 
-const nodeId = process.env.LIGHTSPARK_NODE_ID;
 
 const youtube = google.youtube("v3");
 const oauth2Client = new google.auth.OAuth2(

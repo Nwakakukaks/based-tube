@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SuperSats</title>
+    <title>Aptopus</title>
     <style>
     .app {
         text-align: center;
@@ -478,9 +478,9 @@
         <div class="grid">
             <div class="left-column">
                 <div class="header-content">
-                    <h1 class="main-title">SuperSat⚡ </h1>
+                    <h1 class="main-title">Aptopus 🐙 </h1>
                     <h2>Aptos Superchat for Creators</h2>
-                    <h3>Monetize your live streams with Bitcoin Aptos Network. Keep your 30%!</h3>
+                    <h3>Monetize your live streams with Aptos Network. Keep your 30%!</h3>
                     
                     <div class="features">
                         <div class="feature">
@@ -497,11 +497,11 @@
             
             <div class="right-column">
                 <div class="form-container">                            
-                    <h1>Create your superchat link</h1>
+                    <h1>Create your aptopus link</h1>
                     <p>Generate a unique url and pin it in your live chat</p>
                     <input type="text" id="video-url" placeholder="Enter your YouTube Live URL" />
                     <input type="text" id="aptos-address" placeholder="Enter your Aptos address" />
-                    <button class="submit-button" onclick="generateSuperchatUrl()">Generate SuperSat Link</button>
+                    <button class="submit-button" onclick="generateSuperchatUrl()">Generate Aptopus Link</button>
                     <div id="result" class="generated-url">
                         <p>Your generated URL will appear here</p>
                     </div>
@@ -523,7 +523,7 @@
             </div>
             <div class="analytics-input-box">
                 <h3>Historical chat data</h3>
-                <p>Input your address to see superchats and payments from previou youtube live streams. </p>
+                <p>Input your address to see superchats and payments from previous youtube live streams. </p>
                 <div class="analytics-input-wrapper">
                     <input type="text" id="historical-address" class="analytics-input" placeholder="Insert Address">
                     <button class="analytics-button" onclick="submitHistoricalAddress()">Submit</button>
@@ -565,7 +565,7 @@
                         const superchatUrl = `${window.location.origin}/s/${data.shortCode}`;
                         const resultElement = document.getElementById('result');
                         resultElement.innerHTML = `
-                            <strong>Your Superchat URL:</strong><br>
+                            <strong>Your Aptopus URL:</strong><br>
                             Pin this in your YouTube Live chat:<br>
                             <a href="${superchatUrl}" target="_blank">${superchatUrl}</a>
                         `;
