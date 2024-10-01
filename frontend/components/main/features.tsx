@@ -12,7 +12,7 @@ export const Features = () => {
   return (
     <>
       <div className="bg-black p-6">
-        <p className="text-center text-4xl font-semibold w-2/4 mx-auto mt-6">Discover Key Use Cases for APT-Links</p>
+        <p className="text-center text-4xl font-semibold w-2/4 mx-auto mt-6">Discover Key Use Cases for Aptopuss</p>
         <div className="grid grid-cols-2 gap-3 mt-6">
           <Card className="bg-transparent text-gray-400 border-gray-800 border-2 rounded-none">
             <CardHeader>
@@ -83,7 +83,7 @@ export const Features = () => {
       <Card className="mt-6 py-8 mb-6 bg-gradient-to-b from-teal-100 to-white">
         <CardContent className="flex flex-col gap-3 items-center">
           <p className="text-5xl font-bold">Create . Deploy . Share</p>
-          <p className="font-medium text-gray-600">Explore the endless possibilities with APT-link 🔗🚀</p>
+          <p className="font-medium text-gray-600">Explore the endless possibilities with Aptopus 🔗🚀</p>
           <Button onClick={handleGetStarted} size={"lg"} className="rounded-full">
             Get Started Now
           </Button>

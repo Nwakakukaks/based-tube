@@ -14,7 +14,7 @@ export const HeroSection = () => {
         Run <span className="text-teal-400">Aptos</span> Dapps on any web environment
       </p>
       <p className="text-gray-400 font-medium max-w-2xl mx-auto text-center">
-        Access Aptos dApps across Web2 and Web3 environments. Easily create and share APT-links on platforms like X,
+        Access Aptos dApps across Web2 and Web3 environments. Easily create and share Aptopuss on platforms like X,
         YouTube, and Reddit to unlock webAPTOS 🌟.
       </p>
 

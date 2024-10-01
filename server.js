@@ -40,7 +40,7 @@ oauth2Client.setCredentials({
 });
 
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "frontend", "dist")));
+app.use(express.static(path.join(__dirname, "dist")));
 
 // Include route handlers from webapp/index.js
 const { postToYouTubeChat, getLiveChatId } = require("./chatbot/index");
@@ -48,7 +48,7 @@ const { postToYouTubeChat, getLiveChatId } = require("./chatbot/index");
 app.use(cors());
 
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
 app.post("/send-message", async (req, res) => {

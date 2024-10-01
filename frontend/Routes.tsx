@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import App from "./App";
 import { AssistantPage } from "./pages/assistant/page";
 import Layout from "./layout";
-import { ModulesPage } from "./pages/templates/page";
+import { TemplatePages } from "./pages/dashboard/page";
 
 const AppRoutes = () => {
   return (
@@ -11,7 +11,7 @@ const AppRoutes = () => {
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/assistant" element={<AssistantPage />} />
-          <Route path="/modules" element={<ModulesPage />} />
+          <Route path="/modules" element={<TemplatePages />} />
         </Routes>
       </Layout>
     </Router>
