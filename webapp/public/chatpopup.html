@@ -8,8 +8,8 @@
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const videoId = urlParams.get('vid');
-            const lightningAddress = urlParams.get('lnaddr');
-            const popupUrl = `${window.location.origin}/superchat.html?vid=${videoId}&lnaddr=${lightningAddress}`;
+            const address = urlParams.get('lnaddr');
+            const popupUrl = `${window.location.origin}/superchat.html?vid=${videoId}&lnaddr=${address}`;
             const popup = window.open(popupUrl, 'Superchat', 'width=400,height=600');
             if (popup) {
                 window.close();

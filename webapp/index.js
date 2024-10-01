@@ -74,14 +74,14 @@ async function checkInvoiceStatus(invoice) {
 }
 
 app.post('/send-message', async (req, res) => {
-    const { message, amount, videoId, lightningAddress } = req.body;
+    const { message, amount, videoId, address } = req.body;
     console.log('Received message:', message);
     console.log('Amount:', amount);
     console.log('Video ID:', videoId);
-    console.log('Lightning Address:', lightningAddress);
+    console.log('Lightning Address:', address);
 
     try {
-        const invoice = await createInvoice(amount, `${message}${lightningAddress ? ` | LN:${lightningAddress}` : ''}`);
+        const invoice = await createInvoice(amount, `${message}${address ? ` | LN:${address}` : ''}`);
         console.log('Real invoice:', invoice);
 
         // Get live chat ID

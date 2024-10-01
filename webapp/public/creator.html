@@ -542,16 +542,16 @@
     <script>
         function generateSuperchatUrl() {
             const videoUrl = document.getElementById('video-url').value;
-            const lightningAddress = document.getElementById('lightning-address').value;
+            const address = document.getElementById('lightning-address').value;
             const videoId = extractVideoId(videoUrl);
 
-            if (videoId && lightningAddress) {
+            if (videoId && address) {
                 fetch('/generate-short-url', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ videoId, lightningAddress }),
+                    body: JSON.stringify({ videoId, address }),
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -652,7 +652,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ lightningAddress: historicalAddress }),
+                    body: JSON.stringify({ address: historicalAddress }),
                 })
                 .then(response => response.json())
                 .then(data => {

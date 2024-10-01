@@ -231,7 +231,7 @@
                         message, 
                         amount: parseInt(amount), 
                         videoId,
-                        lightningAddress: new URLSearchParams(window.location.search).get('lnaddr')
+                        address: new URLSearchParams(window.location.search).get('lnaddr')
                     }),
                 })
                 .then(response => response.json())

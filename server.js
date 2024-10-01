@@ -57,50 +57,50 @@ app.get('/superchat', (req, res) => {
 
 app.get('/chatpopup', (req, res) => {
     res.sendFile(path.join(__dirname, 'webapp', 'public', 'chatpopup.html'));
-});
+}); 
 
 //FOR TESTING HOW YOUTUBE CHAT LOOKS WITHOUT USING UP CREDITS. CAN DELETE AFTER 
 app.get('/preview', (req, res) => {
     res.sendFile(path.join(__dirname, 'webapp', 'public', 'superchat_preview.html'));
 });
 
-async function createInvoiceForLightningAddress(lightningAddress, amountSats, memo) {
-  try {
-    const [username, domain] = lightningAddress.split('@');
-    const amountMsats = amountSats * 1000; // Convert sats to msats
-    const metadata = JSON.stringify([
-      ["text/plain", memo],
-      ["text/identifier", lightningAddress],
-    ]);
+// async function createInvoiceForLightningAddress(address, amountSats, memo) {
+//   try {
+//     const [username, domain] = address.split('@');
+//     const amountMsats = amountSats * 1000; // Convert sats to msats
+//     const metadata = JSON.stringify([
+//       ["text/plain", memo],
+//       ["text/identifier", address],
+//     ]);
 
-    console.log(`Creating invoice for ${lightningAddress} with amount ${amountMsats} msats and memo: ${memo}`);
-    const invoice = await lightsparkClient.createLnurlInvoice(
-      nodeId,
-      amountMsats,
-      metadata,
-      undefined, // expirySecs
-      lightningAddress,
-      memo
-    );
+//     console.log(`Creating invoice for ${address} with amount ${amountMsats} msats and memo: ${memo}`);
+//     const invoice = await lightsparkClient.createLnurlInvoice(
+//       nodeId,
+//       amountMsats,
+//       metadata,
+//       undefined, // expirySecs
+//       address,
+//       memo
+//     );
 
-    if (!invoice) {
-      throw new Error("Invoice creation failed.");
-    }
+//     if (!invoice) {
+//       throw new Error("Invoice creation failed.");
+//     }
 
-    console.log('Invoice created successfully');
-    return invoice.data.encodedPaymentRequest;
-  } catch (error) {
-    console.error('Error creating invoice:', error);
-    throw error;
-  }
-}
+//     console.log('Invoice created successfully');
+//     return invoice.data.encodedPaymentRequest;
+//   } catch (error) {
+//     console.error('Error creating invoice:', error);
+//     throw error;
+//   }
+// }
 
 app.post('/send-message', async (req, res) => {
-    const { message, amount, videoId, lightningAddress } = req.body;
+    const { message, amount, videoId, address } = req.body;
     console.log('Received message:', message);
     console.log('Amount:', amount);
     console.log('Video ID:', videoId);
-    console.log('Lightning Address:', lightningAddress);
+    console.log('Lightning Address:', address);
 
     try {
         // Check that video is actually live rn
@@ -108,7 +108,7 @@ app.post('/send-message', async (req, res) => {
         console.log('Live chat ID obtained:', liveChatId);
 
         // Generate invoice using the lightning address LNURL sdk endpoint from lightspark 
-        const invoice = await createInvoiceForLightningAddress(lightningAddress, amount, message);
+        const invoice = await createInvoiceForLightningAddress(address, amount, message);
         console.log('Invoice created:', invoice);
 
         const fullMessage = `⚡⚡ 𝗦𝗨𝗣𝗘𝗥𝗖𝗛𝗔𝗧 [${amount} APTO]: ${message.toUpperCase()}`;
@@ -236,8 +236,8 @@ function generateShortCode() {
 }
 
 app.post('/generate-short-url', async (req, res) => {
-    const { videoId, lightningAddress } = req.body;
-    console.log('Received request:', { videoId, lightningAddress });
+    const { videoId, address } = req.body;
+    console.log('Received request:', { videoId, address });
 
     try {
         // Check that video is actually live
@@ -247,10 +247,10 @@ app.post('/generate-short-url', async (req, res) => {
         const shortCode = generateShortCode();
         
         // FOR TESTING CAN BE DELETED WHEN SORTED
-        const sampleInvoice = await createInvoiceForLightningAddress(lightningAddress, 1000, 'Sample Superchat');
+        const sampleInvoice = await createInvoiceForLightningAddress(address, 1000, 'Sample Superchat');
         console.log('Sample invoice generated:', sampleInvoice);
 
-        shortUrls.set(shortCode, { videoId, lightningAddress, sampleInvoice });
+        shortUrls.set(shortCode, { videoId, address, sampleInvoice });
         console.log('Generated short code:', shortCode);
 
         // Start monitoring the live chat
@@ -270,7 +270,7 @@ app.get('/s/:shortCode', (req, res) => {
     const { shortCode } = req.params;
     const urlData = shortUrls.get(shortCode);
     if (urlData) {
-        res.redirect(`/superchat?vid=${urlData.videoId}&lnaddr=${urlData.lightningAddress}`);
+        res.redirect(`/superchat?vid=${urlData.videoId}&lnaddr=${urlData.address}`);
     } else {
         res.status(404).send('Short URL not found');
     }
@@ -315,7 +315,7 @@ app.post('/start-monitoring', (req, res) => {
 
 app.post('/fetch-messages', async (req, res) => {
     try {
-        const { lightningAddress } = req.body;
+        const { address } = req.body;
         const account = await lightsparkClient.getCurrentAccount();
         if (!account) {
             throw new Error("Unable to fetch the account.");
