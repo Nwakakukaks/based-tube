@@ -479,17 +479,17 @@
             <div class="left-column">
                 <div class="header-content">
                     <h1 class="main-title">SuperSat⚡ </h1>
-                    <h2>Lightning Superchat for Creators</h2>
-                    <h3>Monetize your live streams with Bitcoin Lightning Network. Keep your 30%!</h3>
+                    <h2>Aptos Superchat for Creators</h2>
+                    <h3>Monetize your live streams with Bitcoin Aptos Network. Keep your 30%!</h3>
                     
                     <div class="features">
                         <div class="feature">
                             <h4>Instant Payments</h4>
-                            <p>Receive payments and superchats in real-time directly in stream using the Lightning Network.</p>
+                            <p>Receive payments and superchats in real-time directly in stream using the Aptos Network.</p>
                         </div>
                         <div class="feature">
                             <h4>Easy Setup</h4>
-                            <p>Input your YouTube Live URL and Lightning address, then share the generated link with your viewers on your live.</p>
+                            <p>Input your YouTube Live URL and Aptos address, then share the generated link with your viewers on your live.</p>
                         </div>
                     </div>
                 </div>
@@ -500,7 +500,7 @@
                     <h1>Create your superchat link</h1>
                     <p>Generate a unique url and pin it in your live chat</p>
                     <input type="text" id="video-url" placeholder="Enter your YouTube Live URL" />
-                    <input type="text" id="lightning-address" placeholder="Enter your Lightning address" />
+                    <input type="text" id="aptos-address" placeholder="Enter your Aptos address" />
                     <button class="submit-button" onclick="generateSuperchatUrl()">Generate SuperSat Link</button>
                     <div id="result" class="generated-url">
                         <p>Your generated URL will appear here</p>
@@ -542,7 +542,7 @@
     <script>
         function generateSuperchatUrl() {
             const videoUrl = document.getElementById('video-url').value;
-            const address = document.getElementById('lightning-address').value;
+            const address = document.getElementById('aptos-address').value;
             const videoId = extractVideoId(videoUrl);
 
             if (videoId && address) {
@@ -577,7 +577,7 @@
                     document.getElementById('result').textContent = `Error: ${error.message}`;
                 });
             } else {
-                document.getElementById('result').textContent = 'Invalid input. Please enter a valid YouTube Live URL and Lightning Address.';
+                document.getElementById('result').textContent = 'Invalid input. Please enter a valid YouTube Live URL and Aptos Address.';
             }
         }
 

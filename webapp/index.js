@@ -78,7 +78,7 @@ app.post('/send-message', async (req, res) => {
     console.log('Received message:', message);
     console.log('Amount:', amount);
     console.log('Video ID:', videoId);
-    console.log('Lightning Address:', address);
+    console.log('Aptos Address:', address);
 
     try {
         const invoice = await createInvoice(amount, `${message}${address ? ` | LN:${address}` : ''}`);

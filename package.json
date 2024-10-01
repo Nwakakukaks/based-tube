@@ -1,7 +1,7 @@
 {
-  "name": "lightning-superchat",
+  "name": "aptos-superchat",
   "version": "1.0.0",
-  "description": "Lightning Network Superchat for YouTube",
+  "description": "Aptos Network Superchat for YouTube",
   "scripts": {
     "start": "node server.js",
     "build": "echo 'No build step required'"
