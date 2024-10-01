@@ -14,7 +14,6 @@ const {
 const { google } = require("googleapis");
 const cors = require("cors");
 const { monitorLiveChat, eventEmitter } = require("./chatbot/messageMonitor");
-// const { monitorLiveChat, processMessage } = require('./chatbot/messageMonitor');
 const {
   addValidMessage,
   isValidMessage,
@@ -41,30 +40,15 @@ oauth2Client.setCredentials({
 });
 
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "webapp", "public")));
+app.use(express.static(path.join(__dirname, "frontend", "dist")));
 
 // Include route handlers from webapp/index.js
 const { postToYouTubeChat, getLiveChatId } = require("./chatbot/index");
 
 app.use(cors());
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "webapp", "public", "creator.html"));
-});
-
-app.get("/superchat", (req, res) => {
-  res.sendFile(path.join(__dirname, "webapp", "public", "chatpopup.html"));
-});
-
-app.get("/chatpopup", (req, res) => {
-  res.sendFile(path.join(__dirname, "webapp", "public", "chatpopup.html"));
-});
-
-//FOR TESTING HOW YOUTUBE CHAT LOOKS WITHOUT USING UP CREDITS. CAN DELETE AFTER
-app.get("/preview", (req, res) => {
-  res.sendFile(
-    path.join(__dirname, "webapp", "public", "superchat_preview.html")
-  );
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
 });
 
 app.post("/send-message", async (req, res) => {
