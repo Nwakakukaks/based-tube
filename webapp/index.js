@@ -111,7 +111,7 @@ app.post("/simulate-payment", async (req, res) => {
 if (require.main === module) {
   app
     .listen(port, () => {
-      console.log(`Server running on port ${port}`);
+      console.log(`Server running webapp on port ${port}`);
     })
     .on("error", (err) => {
       console.error("Server error:", err);
