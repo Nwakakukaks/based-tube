@@ -111,7 +111,7 @@ app.post('/send-message', async (req, res) => {
         const invoice = await createInvoiceForLightningAddress(lightningAddress, amount, message);
         console.log('Invoice created:', invoice);
 
-        const fullMessage = `⚡⚡ 𝗦𝗨𝗣𝗘𝗥𝗖𝗛𝗔𝗧 [${amount} 𝗦𝗔𝗧𝗦]: ${message.toUpperCase()}`;
+        const fullMessage = `⚡⚡ 𝗦𝗨𝗣𝗘𝗥𝗖𝗛𝗔𝗧 [${amount} APTO]: ${message.toUpperCase()}`;
         addValidMessage(fullMessage);
 
         res.json({ invoice, status: 'Invoice created' });
@@ -167,7 +167,7 @@ app.post('/simulate-payment', async (req, res) => {
         console.log("Payment done with ID:", payment.id);
 
         const liveChatId = await getLiveChatId(videoId);
-        const fullMessage = `⚡⚡ 𝗦𝗨𝗣𝗘𝗥𝗖𝗛𝗔𝗧 [${amount} 𝗦𝗔𝗧𝗦]: ${message.toUpperCase()}`;
+        const fullMessage = `⚡⚡ 𝗦𝗨𝗣𝗘𝗥𝗖𝗛𝗔𝗧 [${amount} APTO]: ${message.toUpperCase()}`;
         await postToYouTubeChat(fullMessage, liveChatId);
         addValidMessage(fullMessage);
 
