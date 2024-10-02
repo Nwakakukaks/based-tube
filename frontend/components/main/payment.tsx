@@ -1,28 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from "react";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { transferAPT } from "@/entry-functions/transferAPT";
+import { aptosClient } from "@/utils/aptosClient";
+import { toast } from "../ui/use-toast";
+import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Payment: React.FC = () => {
-  const [message, setMessage] = useState('');
-  const [amount, setAmount] = useState('');
+  const { connected, signAndSubmitTransaction } = useWallet();
+  const queryClient = useQueryClient();
+  const [message, setMessage] = useState("");
+  const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
-  const [invoice, setInvoice] = useState('');
-  const [paymentStatus, setPaymentStatus] = useState('');
-  const [showInvoice, setShowInvoice] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [videoId, setVideoId] = useState(new URLSearchParams(window.location.search).get("vid") || '');
-  
-  useEffect(() => {
-    if (invoice) {
-      checkPaymentStatus(invoice);
-    }
-  }, [invoice]);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [videoId, setVideoId] = useState(new URLSearchParams(window.location.search).get("vid") || "");
 
   const sendSuperchat = async () => {
     if (message && amount) {
       setLoading(true);
-      setPaymentStatus("Waiting for payment...");
-      
+
       try {
-        const response = await fetch("/send-message", {
+        const response = await fetch("/api/send-message", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -37,8 +36,7 @@ const Payment: React.FC = () => {
         if (data.error) {
           alert(data.error);
         } else {
-          setShowInvoice(true);
-          setInvoice(data.invoice);
+          await submitPayment();
         }
       } catch (error) {
         alert("Error. Please try again.");
@@ -48,43 +46,64 @@ const Payment: React.FC = () => {
     }
   };
 
-  const checkPaymentStatus = (invoice: string) => {
-    let checkCount = 0;
-    const maxChecks = 30;
-
-    const checkStatus = async () => {
-      if (checkCount >= maxChecks) {
-        setPaymentStatus("Payment timeout. Please try again.");
-        return;
-      }
-      try {
-        const response = await fetch(`/check-invoice/${invoice}`);
-        const data = await response.json();
-        if (data.paid) {
-          showSuccessMessage();
-        } else {
-          checkCount++;
-          setTimeout(checkStatus, 10000);
-        }
-      } catch (error) {
-        setPaymentStatus("Error checking payment status. Please refresh and try again.");
-      }
-    };
-
-    checkStatus();
-  };
-
-  const simulatePayment = async () => {
+  const submitPayment = async () => {
     setLoading(true);
+
+    const address = new URLSearchParams(window.location.search).get("lnaddr");
+    const transferAmount = Math.floor(parseFloat(amount) * Math.pow(10, 8)); // Use parseFloat
+
+    if (isNaN(transferAmount) || transferAmount <= 0) {
+      alert("Please enter a valid amount.");
+      setLoading(false);
+      return;
+    }
+
+    console.log("Amount entered:", amount);
+    console.log("Transfer amount (in smallest unit):", transferAmount);
+
     try {
-      const response = await fetch("/simulate-payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, amount, videoId }),
+      const committedTransaction = await signAndSubmitTransaction(
+        transferAPT({
+          to: address!,
+          amount: transferAmount,
+        }),
+      );
+
+      const executedTransaction = await aptosClient().waitForTransaction({
+        transactionHash: committedTransaction.hash,
       });
-      const data = await response.json();
-      if (data.success) {
-        showSuccessMessage();
+
+      if (executedTransaction && executedTransaction.hash) {
+        queryClient.invalidateQueries();
+
+        toast({
+          title: "Success",
+          description: `Transaction succeeded, hash: ${executedTransaction.hash}`,
+        });
+
+        const hash = executedTransaction.hash;
+        // Simulate the payment
+        const response = await fetch("/api/simulate-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message,
+            amount,
+            videoId,
+            address,
+            hash,
+          }),
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          showSuccessMessage();
+        }
+      } else {
+        toast({
+          title: "Error",
+          description: "Transaction failed. Please try again.",
+        });
       }
     } catch (error) {
       alert("Error simulating payment. Please try again.");
@@ -94,60 +113,40 @@ const Payment: React.FC = () => {
   };
 
   const showSuccessMessage = () => {
-    setShowInvoice(false);
-    setSuccessMessage(`Your Superchat has been posted to YouTube.\nMessage: ${message}\nAmount: ${amount} sats`);
+    setSuccessMessage(`Your Superchat has been posted to YouTube.\nMessage: ${message}\nAmount: ${amount} APTO`);
   };
 
   return (
     <div className="container mx-auto p-4">
-      <div className={`bg-white rounded-lg shadow-md p-6 ${showInvoice ? 'hidden' : ''}`}>
+      <div className={`bg-white rounded-lg shadow-md p-6`}>
         <h1 className="text-2xl text-red-600">Aptopus 🐙</h1>
-        <textarea
-          id="message"
+        <Input
+          name="message"
           placeholder="Enter your Superchat message"
-          rows={4}
+          type="text"
           maxLength={220}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          className="w-full border rounded p-2 mt-2 mb-4"
+          className="w-full border rounded p-2 mt-2 mb-4 text-gray-800"
         />
-        <input
-          type="number"
-          id="amount"
+        <Input
+          name="amount"
           placeholder="Amount in sats"
+          type="number" // Change input type to number
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className="w-full border rounded p-2 mt-2 mb-4"
+          className="w-full border rounded p-2 mt-2 mb-4 text-gray-800"
         />
-        <button
+        <Button
           id="send-superchat-button"
-          onClick={sendSuperchat}
+          onClick={sendSuperchat} // Change to call sendSuperchat
           disabled={loading}
-          className={`w-full bg-gradient-to-br from-red-600 to-red-800 text-white rounded p-2 transition-all duration-300 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+          className={`w-full bg-gradient-to-br from-red-600 to-red-800 text-white rounded p-2 transition-all duration-300 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
         >
-          {loading ? 'Sending...' : 'Send Superchat'}
-        </button>
+          {loading ? "Sending..." : "Send Superchat"}
+        </Button>
         {loading && <div className="loader"></div>}
       </div>
-
-      {showInvoice && (
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h1 className="text-xl">Invoice Details</h1>
-          <p>Please pay the following invoice:</p>
-          <pre id="invoice" className="bg-gray-100 p-2 rounded border">{invoice}</pre>
-          <div id="qrcode" className="flex justify-center my-4">
-            {/* QR Code will be generated here */}
-          </div>
-          <div id="payment-status" className="font-bold text-primary mt-2">{paymentStatus}</div>
-          <button
-            id="simulate-payment-button"
-            onClick={simulatePayment}
-            className="bg-yellow-500 text-white p-2 rounded mt-4"
-          >
-            Pay Now
-          </button>
-        </div>
-      )}
 
       {successMessage && (
         <div className="bg-green-100 rounded-lg p-4 mt-4">

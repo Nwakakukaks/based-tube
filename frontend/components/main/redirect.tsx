@@ -1,18 +1,35 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 
 const RedirectToPayment: React.FC = () => {
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const videoId = urlParams.get('vid');
-    const address = urlParams.get('lnaddr');
-    const popupUrl = `${window.location.origin}/superchat.html?vid=${videoId}&lnaddr=${address}`;
-    const popup = window.open(popupUrl, 'Superchat', 'width=400,height=600');
+    const pathParts = window.location.pathname.split("/");
+    const shortCode = pathParts[pathParts.length - 1];
 
-    if (popup) {
-      window.close();
-    } else {
-      // Fallback for when popups are blocked
-      window.location.href = popupUrl;
+    if (shortCode) {
+      fetch(`api/s/${shortCode}`)
+        .then((response) => {
+          if (!response.ok) {
+            return response.text().then((text) => {
+              throw new Error(text);
+            });
+          }
+          return response.json();
+        })
+        .then((data) => {
+          if (data.url) {
+            const popup = window.open(data.url, "Superchat", "width=400,height=600");
+            if (popup) {
+              window.close();
+            } else {
+              window.location.href = data.url; 
+            }
+          } else {
+            throw new Error("Invalid data returned");
+          }
+        })
+        .catch((error) => {
+          console.error("Error during redirect:", error);
+        });
     }
   }, []);
 

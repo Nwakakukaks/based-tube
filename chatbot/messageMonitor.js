@@ -48,7 +48,7 @@ async function monitorLiveChat(videoId) {
 async function checkLiveChatMessages(videoId, liveChatId) {
     try {
         // Check if the live stream is still active
-        const videoResponse = await youtube.videos.list({
+        const videoResponse = youtube.videos.list({
             auth: oauth2Client,
             part: 'liveStreamingDetails',
             id: videoId
@@ -64,7 +64,7 @@ async function checkLiveChatMessages(videoId, liveChatId) {
         }
 
         // Fetch new messages since the last check
-        const response = await youtube.liveChatMessages.list({
+        const response = youtube.liveChatMessages.list({
             auth: oauth2Client,
             liveChatId: liveChatId,
             part: 'snippet,id',

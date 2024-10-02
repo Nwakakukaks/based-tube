@@ -75,7 +75,7 @@
   }
   body {
     @apply bg-background text-white;
-    background-image: url('/public/icons/black.png'); 
+    background-image: url('/icons/black.png'); 
     background-size: cover; /* Ensure it covers the entire area */
     background-position: center; /* Center the image */
     background-repeat: no-repeat; /* Prevent repeating */

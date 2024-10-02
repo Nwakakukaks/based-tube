@@ -6,14 +6,14 @@
       "use": "@vercel/node"
     },
     {
-      "src": "webapp/public/**",
+      "src": "webapp/**",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "/webapp/public/$1"
+      "dest": "/webapp/$1"
     },
     {
       "src": "/simulate-payment",

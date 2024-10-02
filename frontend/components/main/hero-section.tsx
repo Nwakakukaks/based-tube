@@ -23,7 +23,7 @@ export const HeroSection = () => {
       </Button>
 
       {/* Todo; add image  */}
-      <img src="/public/icons/bg.png" className="rounded-md mt-6 mb-1" />
+      <img src="/icons/bg.png" className="rounded-md mt-6 mb-1" />
     </div>
   );
 };

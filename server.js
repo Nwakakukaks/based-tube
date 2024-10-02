@@ -1,5 +1,6 @@
-// require('dotenv').config(); // Ensure this is at the very top
 const dotenv = require("dotenv");
+dotenv.config();
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const axios = require("axios");
@@ -14,25 +15,19 @@ const {
 const { google } = require("googleapis");
 const cors = require("cors");
 const { monitorLiveChat, eventEmitter } = require("./chatbot/messageMonitor");
-const {
-  addValidMessage,
-  isValidMessage,
-  isSuperchatFormat,
-} = require("./chatbot/messageValidator");
+const { addValidMessage, isValidMessage, isSuperchatFormat } = require("./chatbot/messageValidator");
 
 dotenv.config();
 const app = express();
-const port = process.env.PORT || 3001; //why isnt 3000 working????
+const port = process.env.PORT || 3001;
 
 app.use(express.json()); //  parse JSON in request body
-
-
 
 const youtube = google.youtube("v3");
 const oauth2Client = new google.auth.OAuth2(
   process.env.YOUTUBE_CLIENT_ID,
   process.env.YOUTUBE_CLIENT_SECRET,
-  process.env.YOUTUBE_REDIRECT_URI
+  process.env.YOUTUBE_REDIRECT_URI,
 );
 
 oauth2Client.setCredentials({
@@ -48,7 +43,7 @@ const { postToYouTubeChat, getLiveChatId } = require("./chatbot/index");
 app.use(cors());
 
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 app.post("/send-message", async (req, res) => {
@@ -69,35 +64,11 @@ app.post("/send-message", async (req, res) => {
     res.json({ status: "created" });
   } catch (error) {
     console.error("Error:", error);
-    res
-      .status(500)
-      .json({ status: "Error processing request", error: error.message });
+    res.status(500).json({ status: "Error processing request", error: error.message });
   }
 });
 
-// Area to implement check transaction status
-app.get("/check-invoice/:invoice", async (req, res) => {
-  try {
-    const invoice = req.params.invoice;
-    const paymentHash = invoice.paymentHash;
-
-    const status =
-      paymentHash.length > 0 && paymentHash[0].status === "SUCCESS"
-        ? { paid: true }
-        : { paid: false };
-
-    res.json(status);
-  } catch (error) {
-    console.error("Error checking payment status:", error);
-    res.status(500).json({ error: "Error checking payment status" });
-  }
-});
-
-const validSuperchatsFile = path.join(
-  __dirname,
-  "chatbot",
-  "validSuperchats.json"
-);
+const validSuperchatsFile = path.join(__dirname, "chatbot", "validSuperchats.json");
 
 // Load valid superchats from file
 let validSuperchats = {};
@@ -105,35 +76,25 @@ if (fs.existsSync(validSuperchatsFile)) {
   validSuperchats = JSON.parse(fs.readFileSync(validSuperchatsFile, "utf8"));
 }
 
-// Area to implement APTOS transfer to address
 app.post("/simulate-payment", async (req, res) => {
-  const { message, amount, videoId } = req.body;
+  const { message, amount, videoId, address, hash } = req.body;
+
+  if (!message || !amount || !videoId || !address || !hash) {
+    return res.status(400).json({
+      success: false,
+      message: "All fields (message, amount, videoId, address) are required.",
+    });
+  }
+
   console.log("Payment simulation request received:", {
     message,
     amount,
     videoId,
+    address,
+    hash,
   });
 
   try {
-    await lightsparkClient.loadNodeSigningKey(nodeId, {
-      password: process.env.TEST_NODE_PASSWORD,
-    });
-    console.log("Node signing key loaded.");
-
-    // Convert amount to millisatoshis (multiply by 1000) cos lightspark api expects this
-    const amountMsats = Number(amount) * 1000;
-
-    const payment = await lightsparkClient.payInvoice(
-      nodeId,
-      invoice,
-      amountMsats,
-      60
-    );
-    if (!payment) {
-      throw new Error("Unable to pay invoice.");
-    }
-    console.log("Payment done with ID:", payment.id);
-
     const liveChatId = await getLiveChatId(videoId);
     const fullMessage = `⚡⚡ 𝗦𝗨𝗣𝗘𝗥𝗖𝗛𝗔𝗧 [${amount} APTO]: ${message.toUpperCase()}`;
     await postToYouTubeChat(fullMessage, liveChatId);
@@ -143,11 +104,8 @@ app.post("/simulate-payment", async (req, res) => {
     if (!validSuperchats[videoId]) {
       validSuperchats[videoId] = [];
     }
-    validSuperchats[videoId].push(payment.id);
-    fs.writeFileSync(
-      validSuperchatsFile,
-      JSON.stringify(validSuperchats, null, 2)
-    );
+    validSuperchats[videoId].push(hash);
+    fs.writeFileSync(validSuperchatsFile, JSON.stringify(validSuperchats, null, 2));
 
     // Update the payment status immediately
     res.json({
@@ -185,10 +143,7 @@ app.post("/post-message", async (req, res) => {
     res.json({ status: "Message posted to YouTube live chat" });
   } catch (error) {
     console.error("Error posting to YouTube:", error);
-    console.error(
-      "Error details:",
-      error.response ? error.response.data : "No response data"
-    );
+    console.error("Error details:", error.response ? error.response.data : "No response data");
     res.status(500).json({
       status: "Error posting message",
       error: error.message,
@@ -210,13 +165,11 @@ app.get("/test-youtube-api/:videoId", async (req, res) => {
     res.json({ success: true, liveChatId });
   } catch (error) {
     console.error("Error testing YouTube API:", error);
-    res
-      .status(500)
-      .json({ success: false, error: error.message, stack: error.stack });
+    res.status(500).json({ success: false, error: error.message, stack: error.stack });
   }
 });
 
-const shortUrls = new Map();
+const shortUrls = {};
 
 function generateShortCode() {
   return Math.random().toString(36).substr(2, 6);
@@ -228,21 +181,25 @@ app.post("/generate-short-url", async (req, res) => {
 
   try {
     // Check that video is actually live
-    const liveChatId = await getLiveChatId(videoId);
-    console.log("Live chat ID obtained:", liveChatId);
+    // const liveChatId = await getLiveChatId(videoId);
+    // console.log("Live chat ID obtained:", liveChatId);
 
-    const shortCode = generateShortCode();
+    // const shortCode = generateShortCode();
 
-    shortUrls.set(shortCode, { videoId, address });
-    console.log("Generated short code:", shortCode);
+    // // Store data in the object
+    // shortUrls[shortCode] = { videoId, address };
+    // console.log("Generated short code:", shortCode);
+
+    const fullUrl = `http://localhost:5173/payment?vid=${videoId}&lnaddr=${address}`;
+    console.log("Generated full URL:", fullUrl);
 
     // Start monitoring the live chat
-    monitorLiveChat(videoId).catch((error) => {
-      console.error("Failed to start monitoring:", error);
-      // Don't throw an error here, just log it
-    });
+    // monitorLiveChat(videoId).catch((error) => {
+    //   console.error("Failed to start monitoring:", error);
+    //   // Don't throw an error here, just log it
+    // });
 
-    res.json({ shortCode });
+    res.json({ fullUrl });
   } catch (error) {
     console.error("Error generating short URL:", error);
     res.status(500).json({ error: error.message });
@@ -253,9 +210,11 @@ app.get("/s/:shortCode", (req, res) => {
   const { shortCode } = req.params;
   const urlData = shortUrls.get(shortCode);
   if (urlData) {
-    res.redirect(`/superchat?vid=${urlData.videoId}&lnaddr=${urlData.address}`);
+    const paymentUrl = `/payment?vid=${urlData.videoId}&lnaddr=${urlData.address}`;
+
+    res.json({ url: paymentUrl });
   } else {
-    res.status(404).send("Short URL not found");
+    res.status(404).json({ error: "Short URL not found" });
   }
 });
 
@@ -296,8 +255,7 @@ app.post("/start-monitoring", (req, res) => {
   }
 });
 
-
-// Area to implement transaction messages
+// // Area to implement transaction messages
 app.post("/fetch-messages", async (req, res) => {
   try {
     const { address } = req.body;
@@ -313,11 +271,11 @@ app.post("/fetch-messages", async (req, res) => {
       undefined,
       undefined,
       undefined,
-      BitcoinNetwork.REGTEST
+      BitcoinNetwork.REGTEST,
     );
 
     const sentMessages = transactionsConnection.entities.filter(
-      (transaction) => transaction.typename === "OutgoingPayment"
+      (transaction) => transaction.typename === "OutgoingPayment",
     );
 
     // See what the lightspark api returns with this, could be useful

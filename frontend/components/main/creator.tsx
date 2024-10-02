@@ -13,7 +13,7 @@ const Creator: React.FC = () => {
     const videoId = extractVideoId(videoUrl);
     if (videoId && aptosAddress) {
       try {
-        const response = await fetch('/generate-short-url', {
+        const response = await fetch('/api/generate-short-url', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ const Creator: React.FC = () => {
     const videoId = extractVideoId(liveUrl);
     if (videoId) {
       try {
-        const response = await fetch('/start-monitoring', {
+        const response = await fetch('/api/start-monitoring', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ const Creator: React.FC = () => {
     if (historicalAddress) {
       setLoading(true);
       try {
-        const response = await fetch('/fetch-messages', {
+        const response = await fetch('/api/fetch-messages', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -136,14 +136,14 @@ const Creator: React.FC = () => {
               placeholder="Enter your YouTube Live URL"
               value={videoUrl}
               onChange={(e) => setVideoUrl(e.target.value)}
-              className="mt-4 p-2 border rounded"
+              className="mt-4 p-2 border rounded text-gray-900"
             />
             <input
               type="text"
               placeholder="Enter your Aptos address"
               value={aptosAddress}
               onChange={(e) => setAptosAddress(e.target.value)}
-              className="mt-4 p-2 border rounded"
+              className="mt-4 p-2 border rounded text-gray-900"
             />
             <button
               className="submit-button mt-4 bg-red-600 text-white p-2 rounded hover:bg-red-700"
@@ -152,7 +152,7 @@ const Creator: React.FC = () => {
               Generate Creator Link
             </button>
             {generatedUrl && (
-              <div className="generated-url mt-4 p-4 bg-white rounded shadow">
+              <div className="generated-url mt-4 p-4 bg-white rounded shadow text-gray-900">
                 <p>Your generated URL: <a href={generatedUrl} target="_blank" className="text-blue-500 underline">{generatedUrl}</a></p>
               </div>
             )}

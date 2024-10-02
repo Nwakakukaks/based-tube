@@ -60,7 +60,7 @@ export const AssistantPage = () => {
   return (
     <div className="h-[88vh]">
       <div onClick={handleNavigate} className="flex items-center space-x-2 cursor-pointer my-2">
-        <img src="/public/icons/robot.svg" className="w-8 h-8 " />
+        <img src="/icons/robot.svg" className="w-8 h-8 " />
         <p className="mt-2 text-gray-200"> Welcome to MoJi</p>
       </div>
 
@@ -73,7 +73,7 @@ export const AssistantPage = () => {
             <div
               className={`flex items-start space-x-2 ${msg.sender === "user" ? "bg-teal-200" : "bg-primary"} p-2 rounded-lg shadow`}
             >
-              <img src={`/public/icons/${msg.sender === "user" ? "profile" : "AI"}.svg`} className="h-6 w-6" />
+              <img src={`/icons/${msg.sender === "user" ? "profile" : "AI"}.svg`} className="h-6 w-6" />
               <p className={msg.sender === "user" ? "text-black" : "text-gray-400"}>{msg.content}</p>
             </div>
           </div>

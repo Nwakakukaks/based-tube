@@ -21,7 +21,7 @@ async function postToYouTubeChat(message, liveChatId) {
     console.log('Attempting to post message to YouTube chat:', message);
     console.log('Live Chat ID:', liveChatId);
     try {
-        const response = await youtube.liveChatMessages.insert({
+        const response = youtube.liveChatMessages.insert({
             auth: oauth2Client,
             part: 'snippet',
             resource: {
@@ -44,7 +44,7 @@ async function postToYouTubeChat(message, liveChatId) {
 }
 
 async function getLiveChatId(videoId) {
-    const response = await youtube.videos.list({
+    const response = youtube.videos.list({
         auth: oauth2Client,
         part: 'liveStreamingDetails',
         id: videoId
@@ -59,7 +59,7 @@ async function getLiveChatId(videoId) {
 
 async function deleteMessage(messageId, liveChatId) {
     try {
-        await youtube.liveChatMessages.delete({
+        youtube.liveChatMessages.delete({
             auth: oauth2Client,
             id: messageId,
             liveChatId: liveChatId

@@ -16,7 +16,7 @@ export function LFooter() {
         <div className="flex space-x-3 items-center">
           {showIcon && (
             <img
-              src="/public/icons/Twitter X.svg"
+              src="/icons/Twitter X.svg"
               className="bg-white rounded-sm w-6 h-6 mr-4"
               alt="Twitter"
             />
