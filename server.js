@@ -42,9 +42,9 @@ const { postToYouTubeChat, getLiveChatId } = require("./chatbot/index");
 
 app.use(cors());
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "index.html"));
+// });
 
 app.post("/send-message", async (req, res) => {
   const { message, amount, videoId, address } = req.body;
@@ -180,41 +180,49 @@ app.post("/generate-short-url", async (req, res) => {
   console.log("Received request:", { videoId, address });
 
   try {
-    // Check that video is actually live
-    // const liveChatId = await getLiveChatId(videoId);
-    // console.log("Live chat ID obtained:", liveChatId);
+    const liveChatId = await getLiveChatId(videoId);
 
-    // const shortCode = generateShortCode();
+    const shortCode = generateShortCode();
+    shortUrls[shortCode] = { videoId, address };
 
-    // // Store data in the object
-    // shortUrls[shortCode] = { videoId, address };
-    // console.log("Generated short code:", shortCode);
+    monitorLiveChat(videoId).catch((error) => {
+      console.error("Failed to start monitoring:", error);
+    });
 
-    const fullUrl = `http://localhost:5173/payment?vid=${videoId}&lnaddr=${address}`;
-    console.log("Generated full URL:", fullUrl);
-
-    // Start monitoring the live chat
-    // monitorLiveChat(videoId).catch((error) => {
-    //   console.error("Failed to start monitoring:", error);
-    //   // Don't throw an error here, just log it
-    // });
-
-    res.json({ fullUrl });
+    res.json({ shortCode });
   } catch (error) {
     console.error("Error generating short URL:", error);
     res.status(500).json({ error: error.message });
   }
 });
 
-app.get("/s/:shortCode", (req, res) => {
+app.get("/s/:shortCode", async (req, res) => {
   const { shortCode } = req.params;
-  const urlData = shortUrls.get(shortCode);
-  if (urlData) {
-    const paymentUrl = `/payment?vid=${urlData.videoId}&lnaddr=${urlData.address}`;
 
-    res.json({ url: paymentUrl });
-  } else {
-    res.status(404).json({ error: "Short URL not found" });
+  const urlData = shortUrls[shortCode];
+
+  if (!urlData) {
+    console.log("Short URL not found for code:", shortCode);
+    return res.status(404).json({
+      error: "Short URL not found",
+      code: "NOT_FOUND",
+    });
+  }
+
+  try {
+    const paymentUrl = `http://localhost:5173/payment?vid=${urlData.videoId}&lnaddr=${urlData.address}`;
+    console.log("Generated payment URL:", paymentUrl);
+
+    return res.status(200).json({
+      url: paymentUrl,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error generating payment URL:", error);
+    return res.status(500).json({
+      error: "Failed to generate payment URL",
+      code: "SERVER_ERROR",
+    });
   }
 });
 
@@ -232,6 +240,13 @@ app.get("/superchat-events", (req, res) => {
 
   req.on("close", () => {
     eventEmitter.removeListener("newSuperchat", onNewSuperchat);
+  });
+});
+
+app.get("/debug/urls", (req, res) => {
+  res.json({
+    urlCount: Object.keys(shortUrls).length,
+    urls: shortUrls,
   });
 });
 
