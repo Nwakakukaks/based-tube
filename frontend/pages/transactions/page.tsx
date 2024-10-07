@@ -1,12 +1,10 @@
-
 import { Assistant } from "@/components/main/assistant";
-import Creator from "@/components/main/creator";
-
+import Transactions from "@/components/main/transactions";
 
 export const TransactionPage = () => {
   return (
     <div>
-     <Creator/>
+      <Transactions />
       <Assistant />
     </div>
   );

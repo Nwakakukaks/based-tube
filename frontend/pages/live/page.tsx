@@ -1,12 +1,10 @@
-
 import { Assistant } from "@/components/main/assistant";
-import Streams from "@/components/main/streams";
+import Live from "@/components/main/liveStream";
 
-
-export const StreamPage = () => {
+export const LivePage = () => {
   return (
     <div>
-     <Streams/>
+     <Live/>
       <Assistant />
     </div>
   );
