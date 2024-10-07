@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import DynamicMint from "./token";
 import NFT from "./nft";
 import { useNavigate } from "react-router-dom";
+import { toast } from "../ui/use-toast";
 
 const Creator: React.FC = () => {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ const Creator: React.FC = () => {
         <div className="generated-url mt-4 p-4 bg-white rounded shadow text-gray-900">
           <p>
             Your generated URL:{" "}
-            <a href={generatedUrl} target="_blank" className="text-blue-500 underline">
+            <a href={generatedUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
               {generatedUrl}
             </a>
           </p>
@@ -61,7 +62,7 @@ const Creator: React.FC = () => {
   );
 
   const generateSuperchatUrl = async () => {
-    setLiveUrl(videoUrl)
+    setLiveUrl(videoUrl);
     const videoId = extractVideoId(videoUrl);
     if (videoId && aptosAddress) {
       try {
@@ -118,16 +119,22 @@ const Creator: React.FC = () => {
   const handleLive = () => {
     if (liveUrl.trim()) {
       navigate("/live", { state: { message: liveUrl } });
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: `No url link detected`,
+      });
     }
   };
 
   return (
     <div className="text-center bg-gray-100 p-4">
-      <div className="flex space-x-1 items-center" onClick={handleLive}>
-        <img src="" />
+      <div className="flex space-x-1 items-center text-gray-800 cursor-pointer" onClick={handleLive}>
+        <img src="" alt="" />
         <p>Enter Live</p>
       </div>
-      <div className="">
+      <div>
         <h2 className="text-2xl mb-4 text-gray-800">{steps[currentStep].title}</h2>
         {steps[currentStep].content}
         <div className="flex justify-between mt-4">

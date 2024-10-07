@@ -48,7 +48,7 @@ const Transactions: React.FC = () => {
                 <th className="border px-4 py-2">Amount</th>
                 <th className="border px-4 py-2">Video ID</th>
                 <th className="border px-4 py-2">Timestamp</th>
-                <th className="border px-4 py-2">Address</th>
+                <th className="border px-4 py-2">Sender</th>
                 <th className="border px-4 py-2">Transaction Hash</th>
                 <th className="border px-4 py-2">Message</th>
               </tr>

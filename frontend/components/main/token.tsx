@@ -60,7 +60,7 @@ const DynamicMint = () => {
 
   const [isUploading, setIsUploading] = useState(false);
 
-  const { asset, userMintBalance = 0, yourBalance = 0, maxSupply = 0, currentSupply = 0 } = data ?? {};
+  const { asset } = data ?? {};
 
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
@@ -133,41 +133,6 @@ const DynamicMint = () => {
     }
   };
 
-  // Mint Function
-  const mintFA = async (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    if (!account) {
-      return setError("Please connect your wallet");
-    }
-
-    if (!asset) {
-      return setError("Asset not found");
-    }
-
-    if (!data?.isMintActive) {
-      return setError("Minting is not available");
-    }
-
-    const amount = parseFloat(formData.quantity);
-    if (Number.isNaN(amount) || amount <= 0) {
-      return setError("Invalid amount");
-    }
-
-    const response = await signAndSubmitTransaction(
-      mintAsset({
-        assetType: asset.asset_type,
-        amount,
-        decimals: asset.decimals,
-      }),
-    );
-
-    await aptosClient().waitForTransaction({ transactionHash: response.hash });
-    queryClient.invalidateQueries();
-  };
-
-  const isCreatingToken = !asset;
 
   useEffect(() => {}, [tokenHash]);
 
@@ -323,6 +288,8 @@ const DynamicMint = () => {
           >
             {loading ? "Processing..." : success ? "✓ Done!" : "Create Token" }
           </Button>
+
+          <p className="text-black">Token: {asset?.asset_type}</p>
         </>
       </div>
     </div>

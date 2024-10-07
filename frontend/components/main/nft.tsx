@@ -32,11 +32,7 @@ const NFT = () => {
   const isCollectionCreated = getLastCollection(collections);
 
   const { data } = useGetCollectionData(isCollectionCreated?.collection_id);
-  const queryClient = useQueryClient();
-  const [amount, setAmount] = useState<number>(1);
-  const [address, setAddress] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+ 
   const [files, setFiles] = useState<FileList | null>(null);
   const [preMintAmount, setPreMintAmount] = useState<number>();
   const [publicMintStartDate, setPublicMintStartDate] = useState<Date>();
@@ -46,8 +42,6 @@ const NFT = () => {
   const [royaltyPercentage, setRoyaltyPercentage] = useState<number>();
   const [publicMintLimitPerAccount, setPublicMintLimitPerAccount] = useState<number>(1);
   const [publicMintFeePerNFT, setPublicMintFeePerNFT] = useState<number>();
-
-  const { collection, totalMinted = 0, maxSupply = 1 } = data ?? {};
 
   // Internal state
   const [isUploading, setIsUploading] = useState(false);
@@ -107,21 +101,6 @@ const NFT = () => {
     } finally {
       setIsUploading(false);
     }
-  };
-
-  const handleNFT = async (e: FormEvent) => {
-    e.preventDefault();
-    // if (!account || !data?.isMintActive) return;
-    if (!collection?.collection_id) return;
-
-    console.log("clicked");
-
-    const response = await signAndSubmitTransaction(
-      mintNFT({ collectionId: collection.collection_id, amount: amount }),
-    );
-    await aptosClient().waitForTransaction({ transactionHash: response.hash });
-    queryClient.invalidateQueries();
-    setAmount(1);
   };
 
   const { account, signAndSubmitTransaction } = useWallet();

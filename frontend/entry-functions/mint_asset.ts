@@ -7,15 +7,16 @@ export type MintAssetArguments = {
   assetType: string;
   amount: number;
   decimals: number;
+  address: string;
 };
 
 export const mintAsset = (args: MintAssetArguments): InputTransactionData => {
-  const { assetType, amount, decimals } = args;
+  const { assetType, amount, decimals, address } = args;
   return {
     data: {
       function: `${T_MINTING_MODULE}::launchpad::mint_fa`,
       typeArguments: [],
-      functionArguments: [assetType, convertAmountFromHumanReadableToOnChain(amount, decimals)],
+      functionArguments: [assetType, convertAmountFromHumanReadableToOnChain(amount, decimals), address],
     },
   };
 };

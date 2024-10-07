@@ -1,4 +1,4 @@
-module message_board_addr::vestpad {
+module launchpad_addr::vestpad {
     use std::option::{Self, Option};
     use std::signer;
     use std::string::{Self, String};

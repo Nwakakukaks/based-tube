@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import transactionsData from "../../../chatbot/validTransactions.json"; // Update with your actual path
+import DisburseRewards from "./disbursereward";
 
 interface Transaction {
   amount: string;
@@ -10,11 +11,6 @@ interface Transaction {
   message: string;
 }
 
-// Utility function to shorten crypto addresses and hashes
-const shortenString = (str: string, maxLength: number = 10): string => {
-  if (str.length <= maxLength) return str;
-  return `${str.slice(0, 5)}...${str.slice(-5)}`;
-};
 
 // Group transactions by video ID
 const groupTransactionsByVideoId = (transactions: Transaction[]) => {
@@ -32,7 +28,6 @@ const Streams: React.FC = () => {
   const [groupedStreams, setGroupedStreams] = useState<Record<string, Transaction[]>>({});
 
   useEffect(() => {
-    // Simulate loading time
     const timer = setTimeout(() => {
       const groupedData = groupTransactionsByVideoId(transactionsData);
       setGroupedStreams(groupedData);
@@ -42,27 +37,7 @@ const Streams: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Calculate summary for individual streams
-  const calculateStreamSummary = (transactions: Transaction[]) => {
-    let totalAmount = 0;
-    const uniqueAddresses = new Set<string>();
 
-    transactions.forEach((transaction) => {
-      totalAmount += parseFloat(transaction.amount);
-      uniqueAddresses.add(transaction.address);
-    });
-
-    return {
-      totalAmount,
-      totalContributors: uniqueAddresses.size,
-      contributors: Array.from(uniqueAddresses),
-    };
-  };
-
-  const handleDisburseRewards = (contributors: string[]) => {
-    // Logic for disbursing rewards
-    console.log("Disbursing rewards to:", contributors);
-  };
 
   return (
     <div className="text-center bg-gray-100 p-4 text-gray-800">
@@ -78,43 +53,9 @@ const Streams: React.FC = () => {
         {!loading && Object.keys(groupedStreams).length > 0 && (
           <div className="mt-4">
             {Object.entries(groupedStreams).map(([videoId, transactions]) => {
-              const { totalAmount, totalContributors, contributors } = calculateStreamSummary(transactions);
-
               return (
                 <div key={videoId} className="mb-4">
-                  <h3 className="text-lg font-semibold">Video ID: {videoId}</h3>
-                  <div className="summary mb-2">
-                    <p>Total Amount Received: {totalAmount.toFixed(3)} ETH</p>
-                    <p>Total Contributors: {totalContributors}</p>
-                    <button
-                      onClick={() => handleDisburseRewards(contributors)}
-                      className="mt-2 bg-blue-500 text-white px-4 py-2 rounded"
-                    >
-                      Disburse Rewards
-                    </button>
-                  </div>
-                  <table className="min-w-full mt-2 border-collapse">
-                    <thead>
-                      <tr className="bg-gray-200">
-                        <th className="border px-4 py-2">Amount</th>
-                        <th className="border px-4 py-2">Timestamp</th>
-                        <th className="border px-4 py-2">Address</th>
-                        <th className="border px-4 py-2">Transaction Hash</th>
-                        <th className="border px-4 py-2">Message</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {transactions.map((transaction) => (
-                        <tr key={transaction.transactionHash} className="hover:bg-gray-100">
-                          <td className="border px-4 py-2">{transaction.amount}</td>
-                          <td className="border px-4 py-2">{new Date(transaction.timestamp).toLocaleString()}</td>
-                          <td className="border px-4 py-2">{shortenString(transaction.address)}</td>
-                          <td className="border px-4 py-2">{shortenString(transaction.transactionHash)}</td>
-                          <td className="border px-4 py-2">{transaction.message}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <DisburseRewards videoId={videoId} transactions={transactions} />
                 </div>
               );
             })}

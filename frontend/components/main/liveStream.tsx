@@ -11,6 +11,21 @@ const Live: React.FC = () => {
     if (url) {
       submitLiveUrl(url);
     }
+
+    // EventSource to listen for live data updates
+    const eventSource = new EventSource('/api/superchat-events');
+    eventSource.onmessage = function(event) {
+      const data = JSON.parse(event.data);
+      setDataDisplay(prevData => [
+        ...prevData,
+        { videoId: data.videoId, message: data.messageText }
+      ]);
+    };
+
+  
+    return () => {
+      eventSource.close();
+    };
   }, [location.state]);
 
   const extractVideoId = (url: string) => {
@@ -73,7 +88,8 @@ const Live: React.FC = () => {
             <ul>
               {dataDisplay.map((message, index) => (
                 <li key={index} className="mt-2">
-                  {message}
+                  <strong>Video ID:</strong> {message.videoId} <br />
+                  <strong>Message:</strong> {message.message}
                 </li>
               ))}
             </ul>
