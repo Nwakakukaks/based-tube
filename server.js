@@ -222,6 +222,37 @@ app.get("/s/:shortCode", async (req, res) => {
   }
 });
 
+
+app.get("/c/:shortCode", async (req, res) => {
+  const { shortCode } = req.params;
+
+  const urlData = shortUrls[shortCode];
+
+  if (!urlData) {
+    console.log("Short URL not found for code:", shortCode);
+    return res.status(404).json({
+      error: "Short URL not found",
+      code: "NOT_FOUND",
+    });
+  }
+
+  try {
+    const claimUrl = `http://localhost:5173/claim?vid=${urlData.videoId}&lnaddr=${urlData.address}`;
+    console.log("Generated claim URL:", claimUrl);
+
+    return res.status(200).json({
+      url: claimUrl,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error generating claim URL:", error);
+    return res.status(500).json({
+      error: "Failed to generate claim URL",
+      code: "SERVER_ERROR",
+    });
+  }
+});
+
 // endpoint to stream superchat events
 app.get("/superchat-events", (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");

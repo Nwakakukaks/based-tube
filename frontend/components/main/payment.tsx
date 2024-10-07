@@ -152,6 +152,7 @@ const Payment: React.FC = () => {
         <div className="bg-green-600 rounded-lg p-4 mt-4">
           <h2 className="text-xl font-bold">Payment Successful!</h2>
           <p>{successMessage}</p>
+          <p>Congrats you can claim your membership token and NFT here: <a>http://localhost:5173/claim</a></p>
         </div>
       )}
     </div>

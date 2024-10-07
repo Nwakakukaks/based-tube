@@ -4,10 +4,12 @@ import { AssistantPage } from "./pages/assistant/page";
 import Layout from "./layout";
 import { DashboardPage } from "./pages/dashboard/page";
 import { PaymentPage } from "./pages/payment/page";
-import { PopupPage } from "./pages/popup/page";
+import { RedirectToPaymentPage } from "./pages/redirectPayment/page";
 import { TransactionPage } from "./pages/transactions/page";
 import { StreamPage } from "./pages/streams/page";
 import { LivePage } from "./pages/live/page";
+import { RedirectToClaimPage } from "./pages/redirectClaim/page";
+import { ClaimPage } from "./pages/claim/page";
 
 const AppRoutes = () => {
   return (
@@ -21,7 +23,9 @@ const AppRoutes = () => {
           <Route path="/live" element={<LivePage />} />
           <Route path="/streams" element={<StreamPage />} />
           <Route path="/payment" element={<PaymentPage />} />
-          <Route path="/s/:shortCode" element={<PopupPage />} />
+          <Route path="/claim" element={<ClaimPage />} />
+          <Route path="/s/:shortCode" element={<RedirectToPaymentPage />} />
+          <Route path="/c/:shortCode" element={<RedirectToClaimPage />} />
         </Routes>
       </Layout>
     </Router>

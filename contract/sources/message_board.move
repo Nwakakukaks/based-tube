@@ -1,24 +1,16 @@
-module message_board_addr::vestpad {
+module message_board_addr::launchpad {
     use std::option::{Self, Option};
     use std::signer;
     use std::string::{Self, String};
     use std::vector;
 
-    use aptos_std::simple_map::{Self, SimpleMap};
-    use aptos_std::string_utils;
+    use aptos_std::table::{Self, Table};
 
     use aptos_framework::aptos_account;
     use aptos_framework::event;
-    use aptos_framework::object::{Self, Object, ObjectCore};
-    use aptos_framework::timestamp;
-
-    use aptos_token_objects::collection::{Self, Collection};
-    use aptos_token_objects::royalty::{Self, Royalty};
-    use aptos_token_objects::token::{Self, Token};
-
-    use minter::token_components;
-    use minter::mint_stage;
-    use minter::collection_components;
+    use aptos_framework::fungible_asset::{Self, Metadata};
+    use aptos_framework::object::{Self, Object, ObjectCore, ExtendRef};
+    use aptos_framework::primary_fungible_store;
 
     /// Only admin can update creator
     const EONLY_ADMIN_CAN_UPDATE_CREATOR: u64 = 1;
@@ -28,126 +20,123 @@ module message_board_addr::vestpad {
     const ENOT_PENDING_ADMIN: u64 = 3;
     /// Only admin can update mint fee collector
     const EONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR: u64 = 4;
-    /// Only admin or creator can create collection
-    const EONLY_ADMIN_OR_CREATOR_CAN_CREATE_COLLECTION: u64 = 5;
-    /// No active mint stages
-    const ENO_ACTIVE_STAGES: u64 = 6;
-    /// Creator must set at least one mint stage
-    const EAT_LEAST_ONE_STAGE_IS_REQUIRED: u64 = 7;
-    /// Start time must be set for stage
-    const ESTART_TIME_MUST_BE_SET_FOR_STAGE: u64 = 8;
-    /// End time must be set for stage
-    const EEND_TIME_MUST_BE_SET_FOR_STAGE: u64 = 9;
-    /// Mint limit per address must be set for stage
-    const EMINT_LIMIT_PER_ADDR_MUST_BE_SET_FOR_STAGE: u64 = 10;
+    /// Only admin or creator can create fungible asset
+    const EONLY_ADMIN_OR_CREATOR_CAN_CREATE_FA: u64 = 5;
+    /// No mint limit
+    const ENO_MINT_LIMIT: u64 = 6;
+    /// Mint limit reached
+    const EMINT_LIMIT_REACHED: u64 = 7;
     /// Only admin can update mint enabled
-    const EONLY_ADMIN_CAN_UPDATE_MINT_ENABLED: u64 = 11;
+    const EONLY_ADMIN_CAN_UPDATE_MINT_ENABLED: u64 = 8;
     /// Mint is disabled
-    const EMINT_IS_DISABLED: u64 = 12;
+    const EMINT_IS_DISABLED: u64 = 9;
     /// Cannot mint 0 amount
-    const ECANNOT_MINT_ZERO: u64 = 13;
+    const ECANNOT_MINT_ZERO: u64 = 10;
 
-    /// Default to mint 0 amount to creator when creating collection
+    /// Default to mint 0 amount to creator when creating FA
     const DEFAULT_PRE_MINT_AMOUNT: u64 = 0;
-    /// Default mint fee per NFT denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
-    const DEFAULT_MINT_FEE_PER_NFT: u64 = 0;
-
-    /// 100 years in seconds, we consider mint end time to be infinite when it is set to 100 years after start time
-    const ONE_HUNDRED_YEARS_IN_SECONDS: u64 = 100 * 365 * 24 * 60 * 60;
-
-    /// Category for allowlist mint stage
-    const ALLOWLIST_MINT_STAGE_CATEGORY: vector<u8> = b"Allowlist mint stage";
-    /// Category for public mint stage
-    const PUBLIC_MINT_MINT_STAGE_CATEGORY: vector<u8> = b"Public mint stage";
+    /// Default mint fee per smallest unit of FA denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
+    const DEFAULT_mint_fee_per_smallest_unit_of_fa: u64 = 0;
 
     #[event]
-    struct CreateCollectionEvent has store, drop {
+    struct CreateFAEvent has store, drop {
         creator_addr: address,
-        collection_owner_obj: Object<CollectionOwnerObjConfig>,
-        collection_obj: Object<Collection>,
-        max_supply: u64,
+        fa_owner_obj: Object<FAOwnerObjConfig>,
+        fa_obj: Object<Metadata>,
+        max_supply: Option<u128>,
         name: String,
-        description: String,
-        uri: String,
-        pre_mint_amount: Option<u64>,
-        allowlist: Option<vector<address>>,
-        allowlist_start_time: Option<u64>,
-        allowlist_end_time: Option<u64>,
-        allowlist_mint_limit_per_addr: Option<u64>,
-        allowlist_mint_fee_per_nft: Option<u64>,
-        public_mint_start_time: Option<u64>,
-        public_mint_end_time: Option<u64>,
-        public_mint_limit_per_addr: Option<u64>,
-        public_mint_fee_per_nft: Option<u64>,
+        symbol: String,
+        decimals: u8,
+        icon_uri: String,
+        project_uri: String,
+        mint_fee_per_smallest_unit_of_fa: u64,
+        pre_mint_amount: u64,
+        mint_limit_per_addr: Option<u64>,
     }
 
-     #[event]
-    struct BatchMintNftsEvent has store, drop {
-        collection_obj: Object<Collection>,
-        nft_objs: vector<Object<Token>>,
+    #[event]
+    struct MintFAEvent has store, drop {
+        fa_obj: Object<Metadata>,
+        amount: u64,
         recipient_addr: address,
         total_mint_fee: u64,
     }
 
-    #[event]
-    struct BatchPreMintNftsEvent has store, drop {
-        collection_obj: Object<Collection>,
-        nft_objs: vector<Object<Token>>,
-        recipient_addr: address,
+    /// Unique per FA
+    /// We need this object to own the FA object instead of contract directly owns the FA object
+    /// This helps us avoid address collision when we create multiple FAs with same name
+    struct FAOwnerObjConfig has key {
+        fa_obj: Object<Metadata>,
+        extend_ref: ExtendRef,
     }
 
-    /// Unique per collection
-    /// We need this object to own the collection object instead of contract directly owns the collection object
-    /// This helps us avoid address collision when we create multiple collections with same name
-    struct CollectionOwnerObjConfig has key {
-        collection_obj: Object<Collection>,
-        extend_ref: object::ExtendRef,
+    /// Unique per FA
+    struct FAController has key {
+        mint_ref: fungible_asset::MintRef,
+        burn_ref: fungible_asset::BurnRef,
+        transfer_ref: fungible_asset::TransferRef,
     }
 
-    /// Unique per collection
-    struct CollectionConfig has key {
-        // Key is stage, value is mint fee denomination
-        mint_fee_per_nft_by_stages: SimpleMap<String, u64>,
+    /// Unique per FA
+    struct MintLimit has store {
+        limit: u64,
+        // key is minter address, value is how many tokens minter left to mint
+        // e.g. mint limit is 3, minter has minted 2, mint balance should be 1
+        mint_balance_tracker: Table<address, u64>,
+    }
+
+    /// Unique per FA
+    struct FAConfig has key {
+        // Mint fee per FA denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
+        mint_fee_per_smallest_unit_of_fa: u64,
+        mint_limit: Option<MintLimit>,
         mint_enabled: bool,
-        collection_owner_obj: Object<CollectionOwnerObjConfig>,
-        extend_ref: object::ExtendRef,
-        creator_addr: address,  // Add this line
-        mint_fee_collector_addr: address,  // Add this line
+        fa_owner_obj: Object<FAOwnerObjConfig>,
+        extend_ref: ExtendRef,
     }
 
     /// Global per contract
     struct Registry has key {
-        collection_objects: vector<Object<Collection>>
+        fa_objects: vector<Object<Metadata>>,
     }
 
     /// Global per contract
     struct Config has key {
-        // creator can create collection
-        // creator_addr: address,
+        // creator can create FA
+        creator_addr: address,
         // admin can set pending admin, accept admin, update mint fee collector, create FA and update creator
         admin_addr: address,
         pending_admin_addr: Option<address>,
+        mint_fee_collector_addr: address,
     }
 
     /// If you deploy the module under an object, sender is the object's signer
-    /// If you deploy the module under your own account, sender is your account's signer
+    /// If you deploy the moduelr under your own account, sender is your account's signer
     fun init_module(sender: &signer) {
         move_to(sender, Registry {
-            collection_objects: vector::empty()
+            fa_objects: vector::empty()
         });
         move_to(sender, Config {
+            creator_addr: @message_board_addr,
             admin_addr: signer::address_of(sender),
             pending_admin_addr: option::none(),
-            
+            mint_fee_collector_addr: signer::address_of(sender),
         });
     }
 
     // ================================= Entry Functions ================================= //
 
+    /// Update creator address
+    public entry fun update_creator(sender: &signer, new_creator: address) acquires Config {
+        let sender_addr = signer::address_of(sender);
+        let config = borrow_global_mut<Config>(@message_board_addr);
+        config.creator_addr = new_creator;
+    }
+
     /// Set pending admin of the contract, then pending admin can call accept_admin to become admin
     public entry fun set_pending_admin(sender: &signer, new_admin: address) acquires Config {
         let sender_addr = signer::address_of(sender);
-        let config = borrow_global_mut<Config>(@launchpad_addr);
+        let config = borrow_global_mut<Config>(@message_board_addr);
         assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_SET_PENDING_ADMIN);
         config.pending_admin_addr = option::some(new_admin);
     }
@@ -155,310 +144,246 @@ module message_board_addr::vestpad {
     /// Accept admin of the contract
     public entry fun accept_admin(sender: &signer) acquires Config {
         let sender_addr = signer::address_of(sender);
-        let config = borrow_global_mut<Config>(@launchpad_addr);
+        let config = borrow_global_mut<Config>(@message_board_addr);
         assert!(config.pending_admin_addr == option::some(sender_addr), ENOT_PENDING_ADMIN);
         config.admin_addr = sender_addr;
         config.pending_admin_addr = option::none();
     }
 
-    /// Update mint enabled
-    public entry fun update_mint_enabled(sender: &signer, collection_obj: Object<Collection>, enabled: bool) acquires Config, CollectionConfig {
+    /// Update mint fee collector address
+    public entry fun update_mint_fee_collector(sender: &signer, new_mint_fee_collector: address) acquires Config {
         let sender_addr = signer::address_of(sender);
-        let config = borrow_global_mut<Config>(@launchpad_addr);
-        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_UPDATE_MINT_ENABLED);
-        let collection_obj_addr = object::object_address(&collection_obj);
-        let collection_config = borrow_global_mut<CollectionConfig>(collection_obj_addr);
-        collection_config.mint_enabled = enabled;
+        let config = borrow_global_mut<Config>(@message_board_addr);
+        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR);
+        config.mint_fee_collector_addr = new_mint_fee_collector;
     }
 
+    /// Update mint enabled
+    public entry fun update_mint_enabled(sender: &signer, fa_obj: Object<Metadata>, enabled: bool) acquires Config, FAConfig{
+        let sender_addr = signer::address_of(sender);
+        let config = borrow_global_mut<Config>(@message_board_addr);
+        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_UPDATE_MINT_ENABLED);
+        let fa_obj_addr = object::object_address(&fa_obj);
+        let fa_config = borrow_global_mut<FAConfig>(fa_obj_addr);
+        fa_config.mint_enabled = enabled;
+    }
 
-    /// Create a collection, only admin or creator can create collection
-    public entry fun create_collection(
-        sender: &signer,
-        description: String,
-        name: String,
-        uri: String,
-        max_supply: u64,
-        royalty_percentage: Option<u64>,
-        // Pre mint amount to creator
-        pre_mint_amount: Option<u64>,
-        // Allowlist of addresses that can mint NFTs in allowlist stage
-        allowlist: Option<vector<address>>,
-        allowlist_start_time: Option<u64>,
-        allowlist_end_time: Option<u64>,
-        // Allowlist mint limit per address
-        allowlist_mint_limit_per_addr: Option<u64>,
-        // Allowlist mint fee per NFT denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
-        allowlist_mint_fee_per_nft: Option<u64>,
-        public_mint_start_time: Option<u64>,
-        public_mint_end_time: Option<u64>,
-        // Public mint limit per address
-        public_mint_limit_per_addr: Option<u64>,
-        // Public mint fee per NFT denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
-        public_mint_fee_per_nft: Option<u64>,
-    ) acquires Registry, CollectionConfig, CollectionOwnerObjConfig {
-        let sender_addr = signer::address_of(sender);        
+    /// Create a fungible asset, only admin or creator can create FA
+    public entry fun create_fa(
+    sender: &signer,
+    max_supply: Option<u128>,
+    name: String,
+    symbol: String,
+    decimals: u8,
+    icon_uri: String,
+    project_uri: String,
+    mint_fee_per_smallest_unit_of_fa: Option<u64>,
+    pre_mint_amount: Option<u64>,
+    mint_limit_per_addr: Option<u64>,
+) acquires Registry, Config, FAController {
+    let sender_addr = signer::address_of(sender);
+    let config = borrow_global<Config>(@message_board_addr);
+    assert!(is_admin(config, sender_addr) || is_creator(config, sender_addr), EONLY_ADMIN_OR_CREATOR_CAN_CREATE_FA);
 
-        let royalty = royalty(&mut royalty_percentage, sender_addr);
+        let fa_owner_obj_constructor_ref = &object::create_object(@message_board_addr);
+        let fa_owner_obj_signer = &object::generate_signer(fa_owner_obj_constructor_ref);
 
-        let collection_owner_obj_constructor_ref = &object::create_object(@launchpad_addr);
-        let collection_owner_obj_signer = &object::generate_signer(collection_owner_obj_constructor_ref);
-
-        let collection_obj_constructor_ref =
-            &collection::create_fixed_collection(
-                collection_owner_obj_signer,
-                description,
-                max_supply,
-                name,
-                royalty,
-                uri,
-            );
-        let collection_obj_signer = &object::generate_signer(collection_obj_constructor_ref);
-        let collection_obj_addr = signer::address_of(collection_obj_signer);
-        let collection_obj = object::object_from_constructor_ref(collection_obj_constructor_ref);
-
-        collection_components::create_refs_and_properties(collection_obj_constructor_ref);
-
-        move_to(collection_owner_obj_signer, CollectionOwnerObjConfig {
-            extend_ref: object::generate_extend_ref(collection_owner_obj_constructor_ref),
-            collection_obj,
-        });
-        let collection_owner_obj = object::object_from_constructor_ref(collection_owner_obj_constructor_ref);
-         move_to(collection_obj_signer, CollectionConfig {
-            mint_fee_per_nft_by_stages: simple_map::new(),
-            mint_enabled: true,
-            extend_ref: object::generate_extend_ref(collection_obj_constructor_ref),
-            collection_owner_obj,
-            creator_addr: sender_addr,  // Add this line
-            mint_fee_collector_addr: sender_addr,  // Initially set to creator's address
-        });
-
-        assert!(
-            option::is_some(&allowlist) || option::is_some(&public_mint_start_time),
-            EAT_LEAST_ONE_STAGE_IS_REQUIRED
+        let fa_obj_constructor_ref = &object::create_named_object(
+            fa_owner_obj_signer,
+            *string::bytes(&name),
         );
+        let fa_obj_signer = &object::generate_signer(fa_obj_constructor_ref);
 
-        if (option::is_some(&allowlist)) {
-            add_allowlist_stage(
-                collection_obj,
-                collection_obj_addr,
-                collection_obj_signer,
-                collection_owner_obj_signer,
-                *option::borrow(&allowlist),
-                allowlist_start_time,
-                allowlist_end_time,
-                allowlist_mint_limit_per_addr,
-                allowlist_mint_fee_per_nft,
-            );
-        };
-
-        if (option::is_some(&public_mint_start_time)) {
-            add_public_mint_stage(
-                collection_obj,
-                collection_obj_addr,
-                collection_obj_signer,
-                collection_owner_obj_signer,
-                *option::borrow(&public_mint_start_time),
-                public_mint_end_time,
-                public_mint_limit_per_addr,
-                public_mint_fee_per_nft,
-            );
-        };
-
-        let registry = borrow_global_mut<Registry>(@launchpad_addr);
-        vector::push_back(&mut registry.collection_objects, collection_obj);
-
-        event::emit(CreateCollectionEvent {
-            creator_addr: sender_addr,
-            collection_owner_obj,
-            collection_obj,
+        primary_fungible_store::create_primary_store_enabled_fungible_asset(
+            fa_obj_constructor_ref,
             max_supply,
             name,
-            description,
-            uri,
-            pre_mint_amount,
-            allowlist,
-            allowlist_start_time,
-            allowlist_end_time,
-            allowlist_mint_limit_per_addr,
-            allowlist_mint_fee_per_nft,
-            public_mint_start_time,
-            public_mint_end_time,
-            public_mint_limit_per_addr,
-            public_mint_fee_per_nft,
+            symbol,
+            decimals,
+            icon_uri,
+            project_uri
+        );
+        let fa_obj = object::object_from_constructor_ref(fa_obj_constructor_ref);
+        move_to(fa_owner_obj_signer, FAOwnerObjConfig {
+            fa_obj,
+            extend_ref: object::generate_extend_ref(fa_owner_obj_constructor_ref),
+        });
+        let fa_owner_obj = object::object_from_constructor_ref(fa_owner_obj_constructor_ref);
+        let mint_ref = fungible_asset::generate_mint_ref(fa_obj_constructor_ref);
+        let burn_ref = fungible_asset::generate_burn_ref(fa_obj_constructor_ref);
+        let transfer_ref = fungible_asset::generate_transfer_ref(fa_obj_constructor_ref);
+        move_to(fa_obj_signer, FAController {
+            mint_ref,
+            burn_ref,
+            transfer_ref,
+        });
+        move_to(fa_obj_signer, FAConfig {
+            mint_fee_per_smallest_unit_of_fa: *option::borrow_with_default(
+                &mint_fee_per_smallest_unit_of_fa,
+                &DEFAULT_mint_fee_per_smallest_unit_of_fa
+            ),
+            mint_limit: if (option::is_some(&mint_limit_per_addr)) {
+                option::some(MintLimit {
+                    limit: *option::borrow(&mint_limit_per_addr),
+                    mint_balance_tracker: table::new()
+                })
+            } else {
+                option::none()
+            },
+            mint_enabled: true,
+            extend_ref: object::generate_extend_ref(fa_obj_constructor_ref),
+            fa_owner_obj,
         });
 
-        let nft_objs = vector[];
-        for (i in 0..*option::borrow_with_default(&pre_mint_amount, &DEFAULT_PRE_MINT_AMOUNT)) {
-            let nft_obj = mint_nft_internal(sender_addr, collection_obj);
-            vector::push_back(&mut nft_objs, nft_obj);
-        };
+        let registry = borrow_global_mut<Registry>(@message_board_addr);
+        vector::push_back(&mut registry.fa_objects, fa_obj);
 
-        event::emit(BatchPreMintNftsEvent {
-            recipient_addr: sender_addr,
-            collection_obj,
-            nft_objs,
+        event::emit(CreateFAEvent {
+            creator_addr: sender_addr,
+            fa_owner_obj,
+            fa_obj,
+            max_supply,
+            name,
+            symbol,
+            decimals,
+            icon_uri,
+            project_uri,
+            mint_fee_per_smallest_unit_of_fa: *option::borrow_with_default(
+                &mint_fee_per_smallest_unit_of_fa,
+                &DEFAULT_mint_fee_per_smallest_unit_of_fa
+            ),
+            pre_mint_amount: *option::borrow_with_default(&pre_mint_amount, &DEFAULT_PRE_MINT_AMOUNT),
+            mint_limit_per_addr,
         });
+
+        if (*option::borrow_with_default(&pre_mint_amount, &DEFAULT_PRE_MINT_AMOUNT) > 0) {
+        let amount = *option::borrow(&pre_mint_amount);
+        // Pass sender_addr as the receiver address for the pre-mint
+        mint_fa_internal(sender, fa_obj, amount, 0, sender_addr);
     }
 
-   /// Mint NFT, anyone with enough mint fee and has not reached mint limit can mint NFT
-    /// If we are in allowlist stage, only addresses in allowlist can mint NFT
-    public entry fun mint_nft(
-        sender: &signer,
-        collection_obj: Object<Collection>,
-        amount: u64,
-        receiver_addr: address,  // New parameter for receiver address
-    ) acquires CollectionConfig, CollectionOwnerObjConfig {
-        assert!(amount > 0, ECANNOT_MINT_ZERO);
-        assert!(is_mint_enabled(collection_obj), EMINT_IS_DISABLED);
-        let sender_addr = signer::address_of(sender);
-
-        let stage_idx = &mint_stage::execute_earliest_stage(sender, collection_obj, amount);
-        assert!(option::is_some(stage_idx), ENO_ACTIVE_STAGES);
-
-        let stage_obj = mint_stage::find_mint_stage_by_index(collection_obj, *option::borrow(stage_idx));
-        let stage_name = mint_stage::mint_stage_name(stage_obj);
-        let total_mint_fee = get_mint_fee(collection_obj, stage_name, amount);
-        
-        pay_for_mint(sender, collection_obj, total_mint_fee);
-
-        let nft_objs = vector[];
-        for (i in 0..amount) {
-            let nft_obj = mint_nft_internal(receiver_addr, collection_obj);  // Use receiver_addr instead of sender_addr
-            vector::push_back(&mut nft_objs, nft_obj);
-        };
-
-        event::emit(BatchMintNftsEvent {
-            recipient_addr: receiver_addr,  // Use receiver_addr in event
-            total_mint_fee,
-            collection_obj,
-            nft_objs,
-        });
     }
 
+    /// Mint fungible asset, anyone with enough mint fee and has not reached mint limit can mint FA
+    /// Now accepts a receiver_addr parameter to specify who receives the minted tokens
+  public entry fun mint_fa(
+    sender: &signer,
+    fa_obj: Object<Metadata>,
+    amount: u64,
+    receiver_addr: address,
+) acquires FAController, FAConfig, Config {
+    assert!(amount > 0, ECANNOT_MINT_ZERO);
+    assert!(is_mint_enabled(fa_obj), EMINT_IS_DISABLED);
+    let sender_addr = signer::address_of(sender);
+    check_mint_limit_and_update_mint_tracker(sender_addr, fa_obj, amount);
+    let total_mint_fee = get_mint_fee(fa_obj, amount);
+    pay_for_mint(sender, total_mint_fee);
+    mint_fa_internal(sender, fa_obj, amount, total_mint_fee, receiver_addr);
+}
 
-    // ================================= View  ================================= //
+    // ================================= View Functions ================================== //
 
     #[view]
-    /// Get creator, creator is the address that is allowed to create collections
-    public fun get_creator(collection_obj: Object<Collection>): address acquires CollectionConfig {
-        let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
-        collection_config.creator_addr
+    /// Get creator, creator is the address that is allowed to create FAs
+    public fun get_creator(): address acquires Config {
+        let config = borrow_global<Config>(@message_board_addr);
+        config.creator_addr
     }
 
     #[view]
     /// Get contract admin
     public fun get_admin(): address acquires Config {
-        let config = borrow_global<Config>(@launchpad_addr);
+        let config = borrow_global<Config>(@message_board_addr);
         config.admin_addr
     }
 
     #[view]
     /// Get contract pending admin
     public fun get_pending_admin(): Option<address> acquires Config {
-        let config = borrow_global<Config>(@launchpad_addr);
+        let config = borrow_global<Config>(@message_board_addr);
         config.pending_admin_addr
     }
 
     #[view]
-    public fun get_mint_fee_collector(collection_obj: Object<Collection>): address acquires CollectionConfig {
-        let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
-        collection_config.mint_fee_collector_addr
-    }
-
-
-    #[view]
-    /// Get all collections created using this contract
-    public fun get_registry(): vector<Object<Collection>> acquires Registry {
-        let registry = borrow_global<Registry>(@launchpad_addr);
-        registry.collection_objects
+    /// Get mint fee collector address
+    public fun get_mint_fee_collector(): address acquires Config {
+        let config = borrow_global<Config>(@message_board_addr);
+        config.mint_fee_collector_addr
     }
 
     #[view]
-    /// Is mint enabled for the collection
-    public fun is_mint_enabled(collection_obj: Object<Collection>): bool acquires CollectionConfig {
-        let collection_addr = object::object_address(&collection_obj);
-        let collection_config = borrow_global<CollectionConfig>(collection_addr);
-        collection_config.mint_enabled
+    /// Get all fungible assets created using this contract
+    public fun get_registry(): vector<Object<Metadata>> acquires Registry {
+        let registry = borrow_global<Registry>(@message_board_addr);
+        registry.fa_objects
     }
 
     #[view]
-    /// Get mint fee for a specific stage, denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
-    public fun get_mint_fee(
-        collection_obj: Object<Collection>,
-        stage_name: String,
-        amount: u64,
-    ): u64 acquires CollectionConfig {
-        let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
-        let fee = *simple_map::borrow(&collection_config.mint_fee_per_nft_by_stages, &stage_name);
-        amount * fee
+    /// Get fungible asset metadata
+    public fun get_fa_objects_metadatas(
+        fa_obj: Object<Metadata>
+    ): (String, String, u8) {
+        let name = fungible_asset::name(fa_obj);
+        let symbol = fungible_asset::symbol(fa_obj);
+        let decimals = fungible_asset::decimals(fa_obj);
+        (symbol, name, decimals)
     }
 
     #[view]
-    /// Get mint balance for the stage, i.e. how many NFT user can mint
-    /// e.g. If the mint limit is 1, user has already minted 1, balance is 0
-    public fun get_mint_balance(collection_obj: Object<Collection>, stage_name: String, user_addr: address): u64 {
-        let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage_name);
-        if (stage_name == string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY)) {
-            mint_stage::allowlist_balance(collection_obj, stage_idx, user_addr)
+    /// Get mint limit per address
+    public fun get_mint_limit(
+        fa_obj: Object<Metadata>,
+    ): Option<u64> acquires FAConfig {
+        let fa_config = borrow_global<FAConfig>(object::object_address(&fa_obj));
+        if (option::is_some(&fa_config.mint_limit)) {
+            option::some(option::borrow(&fa_config.mint_limit).limit)
         } else {
-            mint_stage::public_stage_with_limit_user_balance(collection_obj, stage_idx, user_addr)
-        }
-    }
-
-    #[view]
-    /// Get the name of the current active mint stage or the next mint stage if there is no active mint stage
-    public fun get_active_or_next_mint_stage(collection_obj: Object<Collection>): Option<String> {
-        let active_stage_idx = mint_stage::ccurent_active_stage(collection_obj);
-        if (option::is_some(&active_stage_idx)) {
-            let stage_obj = mint_stage::find_mint_stage_by_index(collection_obj, *option::borrow(&active_stage_idx));
-            let stage_name = mint_stage::mint_stage_name(stage_obj);
-            option::some(stage_name)
-        } else {
-            let stages = mint_stage::stages(collection_obj);
-            for (i in 0..vector::length(&stages)) {
-                let stage_name = *vector::borrow(&stages, i);
-                let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage_name);
-                if (mint_stage::start_time(collection_obj, stage_idx) > timestamp::now_seconds()) {
-                    return option::some(stage_name)
-                }
-            };
             option::none()
         }
     }
 
     #[view]
-    /// Get the start and end time of a mint stage
-    public fun get_mint_stage_start_and_end_time(collection_obj: Object<Collection>, stage_name: String): (u64, u64) {
-        let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage_name);
-        let stage_obj = mint_stage::find_mint_stage_by_index(collection_obj, stage_idx);
-        let start_time = mint_stage::mint_stage_start_time(stage_obj);
-        let end_time = mint_stage::mint_stage_end_time(stage_obj);
-        (start_time, end_time)
+    /// Get mint balance, i.e. how many tokens user can mint
+    /// e.g. If the mint limit is 1, user has already minted 1, balance is 0
+    public fun get_mint_balance(
+        fa_obj: Object<Metadata>,
+        addr: address
+    ): u64 acquires FAConfig {
+        let fa_config = borrow_global<FAConfig>(object::object_address(&fa_obj));
+        assert!(option::is_some(&fa_config.mint_limit), ENO_MINT_LIMIT);
+        let mint_limit = option::borrow(&fa_config.mint_limit);
+        let mint_tracker = &mint_limit.mint_balance_tracker;
+        *table::borrow_with_default(mint_tracker, addr, &mint_limit.limit)
     }
 
-    public entry fun update_collection_mint_fee_collector(
-    sender: &signer,
-    collection_obj: Object<Collection>,
-    new_mint_fee_collector: address
-    ) acquires Config, CollectionConfig {
-        let sender_addr = signer::address_of(sender);
-        let config = borrow_global<Config>(@launchpad_addr);
-        assert!(is_admin(config, sender_addr), EONLY_ADMIN_CAN_UPDATE_MINT_FEE_COLLECTOR);
-        
-        let collection_config = borrow_global_mut<CollectionConfig>(object::object_address(&collection_obj));
-        collection_config.mint_fee_collector_addr = new_mint_fee_collector;
+    #[view]
+    /// Get mint fee denominated in oapt (smallest unit of APT, i.e. 1e-8 APT)
+    public fun get_mint_fee(
+        fa_obj: Object<Metadata>,
+        // Amount in smallest unit of FA
+        amount: u64,
+    ): u64 acquires FAConfig {
+        let fa_config = borrow_global<FAConfig>(object::object_address(&fa_obj));
+        amount * fa_config.mint_fee_per_smallest_unit_of_fa
     }
 
-    // ================================= Helpers ================================= //
+    #[view]
+    /// Is mint enabled for the fa
+    public fun is_mint_enabled(fa_obj: Object<Metadata>): bool acquires FAConfig {
+        let fa_addr = object::object_address(&fa_obj);
+        let fa_config = borrow_global<FAConfig>(fa_addr);
+        fa_config.mint_enabled
+    }
+
+    // ================================= Helper Functions ================================== //
 
     /// Check if sender is admin or owner of the object when package is published to object
     fun is_admin(config: &Config, sender: address): bool {
         if (sender == config.admin_addr) {
             true
         } else {
-            if (object::is_object(@launchpad_addr)) {
-                let obj = object::address_to_object<ObjectCore>(@launchpad_addr);
+            if (object::is_object(@message_board_addr)) {
+                let obj = object::address_to_object<ObjectCore>(@message_board_addr);
                 object::is_owner(obj, sender)
             } else {
                 false
@@ -466,166 +391,61 @@ module message_board_addr::vestpad {
         }
     }
 
-    /// Check if sender is allowed to create collections
-    // fun is_creator(config: &Config, sender: address): bool {
-    //     sender == config.creator_addr
-    // }
-
-    /// Add allowlist mint stage
-    fun add_allowlist_stage(
-        collection_obj: Object<Collection>,
-        collection_obj_addr: address,
-        collection_obj_signer: &signer,
-        collection_owner_obj_signer: &signer,
-        allowlist: vector<address>,
-        allowlist_start_time: Option<u64>,
-        allowlist_end_time: Option<u64>,
-        allowlist_mint_limit_per_addr: Option<u64>,
-        allowlist_mint_fee_per_nft: Option<u64>,
-    ) acquires CollectionConfig {
-        assert!(option::is_some(&allowlist_start_time), ESTART_TIME_MUST_BE_SET_FOR_STAGE);
-        assert!(option::is_some(&allowlist_end_time), EEND_TIME_MUST_BE_SET_FOR_STAGE);
-        assert!(option::is_some(&allowlist_mint_limit_per_addr), EMINT_LIMIT_PER_ADDR_MUST_BE_SET_FOR_STAGE);
-
-        let stage = string::utf8(ALLOWLIST_MINT_STAGE_CATEGORY);
-        mint_stage::create(
-            collection_obj_signer,
-            stage,
-            *option::borrow(&allowlist_start_time),
-            *option::borrow(&allowlist_end_time),
-        );
-
-        for (i in 0..vector::length(&allowlist)) {
-            mint_stage::upsert_allowlist(
-                collection_owner_obj_signer,
-                collection_obj,
-                mint_stage::find_mint_stage_index_by_name(collection_obj, stage),
-                *vector::borrow(&allowlist, i),
-                *option::borrow(&allowlist_mint_limit_per_addr)
-            );
-        };
-
-        let collection_config = borrow_global_mut<CollectionConfig>(collection_obj_addr);
-        simple_map::upsert(
-            &mut collection_config.mint_fee_per_nft_by_stages,
-            stage,
-            *option::borrow_with_default(&allowlist_mint_fee_per_nft, &DEFAULT_MINT_FEE_PER_NFT)
-        );
+    /// Check if sender is allowed to create FA
+    fun is_creator(config: &Config, sender: address): bool {
+        sender == config.creator_addr
     }
 
-    /// Add public mint stage
-    fun add_public_mint_stage(
-        collection_obj: Object<Collection>,
-        collection_obj_addr: address,
-        collection_obj_signer: &signer,
-        collection_owner_obj_signer: &signer,
-        public_mint_start_time: u64,
-        public_mint_end_time: Option<u64>,
-        public_mint_limit_per_addr: Option<u64>,
-        public_mint_fee_per_nft: Option<u64>,
-    ) acquires CollectionConfig {
-        assert!(option::is_some(&public_mint_limit_per_addr), EMINT_LIMIT_PER_ADDR_MUST_BE_SET_FOR_STAGE);
-
-        let stage = string::utf8(PUBLIC_MINT_MINT_STAGE_CATEGORY);
-        mint_stage::create(
-            collection_obj_signer,
-            stage,
-            public_mint_start_time,
-            *option::borrow_with_default(
-                &public_mint_end_time,
-                &(ONE_HUNDRED_YEARS_IN_SECONDS + public_mint_start_time)
-            ),
-        );
-
-        let stage_idx = mint_stage::find_mint_stage_index_by_name(collection_obj, stage);
-
-        if (option::is_some(&public_mint_limit_per_addr)) {
-            mint_stage::upsert_public_stage_max_per_user(
-                collection_owner_obj_signer,
-                collection_obj,
-                stage_idx,
-                *option::borrow(&public_mint_limit_per_addr)
+    /// Check mint limit and update mint tracker
+    fun check_mint_limit_and_update_mint_tracker(
+        sender: address,
+        fa_obj: Object<Metadata>,
+        amount: u64,
+    ) acquires FAConfig {
+        let mint_limit = get_mint_limit(fa_obj);
+        if (option::is_some(&mint_limit)) {
+            let mint_balance = get_mint_balance(fa_obj, sender);
+            assert!(
+                mint_balance >= amount,
+                EMINT_LIMIT_REACHED,
             );
-        };
-
-        let collection_config = borrow_global_mut<CollectionConfig>(collection_obj_addr);
-        simple_map::upsert(
-            &mut collection_config.mint_fee_per_nft_by_stages,
-            stage,
-            *option::borrow_with_default(&public_mint_fee_per_nft, &DEFAULT_MINT_FEE_PER_NFT),
-        );
+            let fa_config = borrow_global_mut<FAConfig>(object::object_address(&fa_obj));
+            let mint_limit = option::borrow_mut(&mut fa_config.mint_limit);
+            table::upsert(&mut mint_limit.mint_balance_tracker, sender, mint_balance - amount)
+        }
     }
+
+    /// Actual implementation of minting FA
+fun mint_fa_internal(
+    sender: &signer,
+    fa_obj: Object<Metadata>,
+    amount: u64,
+    total_mint_fee: u64,
+    receiver_addr: address,
+) acquires FAController {
+    let fa_obj_addr = object::object_address(&fa_obj);
+    let fa_controller = borrow_global<FAController>(fa_obj_addr);
+    
+    // Mint to receiver_addr
+    primary_fungible_store::mint(&fa_controller.mint_ref, receiver_addr, amount);
+
+    event::emit(MintFAEvent {
+        fa_obj,
+        amount,
+        recipient_addr: receiver_addr,
+        total_mint_fee,
+    });
+}
 
     /// Pay for mint
-    fun pay_for_mint(sender: &signer, collection_obj: Object<Collection>, mint_fee: u64) acquires CollectionConfig {
-        if (mint_fee > 0) {
-            let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
-            aptos_account::transfer(sender, collection_config.creator_addr, mint_fee);
+    fun pay_for_mint(
+        sender: &signer,
+        total_mint_fee: u64
+    ) acquires Config {
+        if (total_mint_fee > 0) {
+            let config = borrow_global<Config>(@message_board_addr);
+            aptos_account::transfer(sender, config.mint_fee_collector_addr, total_mint_fee)
         }
-    }
-
-    /// Create royalty object
-    fun royalty(
-        royalty_numerator: &mut Option<u64>,
-        admin_addr: address,
-    ): Option<Royalty> {
-        if (option::is_some(royalty_numerator)) {
-            let num = option::extract(royalty_numerator);
-            option::some(royalty::create(num, 100, admin_addr))
-        } else {
-            option::none()
-        }
-    }
-
-    /// Actual implementation of minting NFT
-    fun mint_nft_internal(
-        receiver_addr: address,  // Changed from sender_addr to receiver_addr
-        collection_obj: Object<Collection>,
-    ): Object<Token> acquires CollectionConfig, CollectionOwnerObjConfig {
-        let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
-
-        let collection_owner_obj = collection_config.collection_owner_obj;
-        let collection_owner_config = borrow_global<CollectionOwnerObjConfig>(
-            object::object_address(&collection_owner_obj)
-        );
-        let collection_owner_obj_signer = &object::generate_signer_for_extending(&collection_owner_config.extend_ref);
-
-        let next_nft_id = *option::borrow(&collection::count(collection_obj)) + 1;
-
-        let collection_uri = collection::uri(collection_obj);
-        let nft_metadata_uri = construct_nft_metadata_uri(&collection_uri, next_nft_id);
-
-        let nft_obj_constructor_ref = &token::create(
-            collection_owner_obj_signer,
-            collection::name(collection_obj),
-            // placeholder value, please read description from json metadata in offchain storage
-            string_utils::to_string(&next_nft_id),
-            // placeholder value, please read name from json metadata in offchain storage
-            string_utils::to_string(&next_nft_id),
-            royalty::get(collection_obj),
-            nft_metadata_uri,
-        );
-        token_components::create_refs(nft_obj_constructor_ref);
-        let nft_obj = object::object_from_constructor_ref(nft_obj_constructor_ref);
-        object::transfer(collection_owner_obj_signer, nft_obj, receiver_addr);  // Transfer to receiver_addr
-
-        nft_obj
-    }
-
-
-    /// Construct NFT metadata URI
-    fun construct_nft_metadata_uri(
-        collection_uri: &String,
-        next_nft_id: u64,
-    ): String {
-        let nft_metadata_uri = &mut string::sub_string(
-            collection_uri,
-            0,
-            string::length(collection_uri) - string::length(&string::utf8(b"collection.json"))
-        );
-        let nft_metadata_filename = string_utils::format1(&b"{}.json", next_nft_id);
-        string::append(nft_metadata_uri, nft_metadata_filename);
-        *nft_metadata_uri
     }
 
     // ================================= Uint Tests ================================== //

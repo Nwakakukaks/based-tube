@@ -133,10 +133,7 @@ const DynamicMint = () => {
     }
   };
 
-
   useEffect(() => {}, [tokenHash]);
-
-  console.log(tokenHash);
 
   return (
     <div className="bg-white rounded-none w-full shadow-md mx-auto border-2 border-black h-[460px] font-vt323 overflow-y-auto">
@@ -210,7 +207,9 @@ const DynamicMint = () => {
 
           <div className="flex items-center space-x-2 my-3">
             <Checkbox id="advanced" checked={showAdvanced} onCheckedChange={() => setShowAdvanced(!showAdvanced)} />
-            <Label htmlFor="advanced" className="text-black">Show advanced options</Label>
+            <Label htmlFor="advanced" className="text-black">
+              Show advanced options
+            </Label>
           </div>
 
           {showAdvanced && (
@@ -286,7 +285,7 @@ const DynamicMint = () => {
                   : "bg-red-600 hover:bg-red-400"
             } text-white font-bold py-2 px-4 rounded`}
           >
-            {loading ? "Processing..." : success ? "✓ Done!" : "Create Token" }
+            {loading ? "Processing..." : success ? "✓ Done!" : "Create Token"}
           </Button>
 
           <p className="text-black">Token: {asset?.asset_type}</p>

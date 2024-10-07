@@ -42,9 +42,9 @@ const Transactions: React.FC = () => {
         )}
 
         {!loading && dataDisplay.length > 0 && (
-          <table className="min-w-full mt-4 border-collapse">
+          <table className="min-w-full mt-4 border-2 border-black">
             <thead>
-              <tr className="bg-gray-200">
+              <tr className="bg-[#89e219]">
                 <th className="border px-4 py-2">Amount</th>
                 <th className="border px-4 py-2">Video ID</th>
                 <th className="border px-4 py-2">Timestamp</th>

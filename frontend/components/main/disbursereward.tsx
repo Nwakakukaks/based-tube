@@ -109,7 +109,7 @@ const DisburseRewards = ({ videoId, transactions }: { videoId: string; transacti
         try {
           const response = await signAndSubmitTransaction(
             mintAsset({
-              assetType: "FungibleAsset",
+              assetType: "0x996ef140a51d2301075bca23c32e9432e4b23909d3b090ae2247c8b6ef70d9a8",
               amount: 1,
               address: address,
               decimals: 8,
@@ -150,14 +150,14 @@ const DisburseRewards = ({ videoId, transactions }: { videoId: string; transacti
   return (
     <div className="bg-white rounded-none w-full shadow-md mx-auto border-2 border-black font-vt323">
       <div className="h-6 bg-[#89e219] w-full flex justify-between px-2">
-        <p className="text-base font-semibold text-black">Reward Distribution</p>
-        <img src="https://utfs.io/f/PKy8oE1GN2J3JMeRo2HVozIYU8DFRWmkp7SC4bh16KiGHZfv" alt="Logo" />
+        <p className="text-base font-semibold text-black">{videoId}</p>
+        {/* <img src="https://utfs.io/f/PKy8oE1GN2J3JMeRo2HVozIYU8DFRWmkp7SC4bh16KiGHZfv" alt="Logo" /> */}
       </div>
 
       <div className="p-4">
         <Card>
           <CardHeader className="pb-3">
-            <h2 className="text-lg font-bold">Stream {videoId} Summary</h2>
+            <h2 className="text-lg font-bold">Stream Summary</h2>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4 mb-4">
@@ -171,7 +171,7 @@ const DisburseRewards = ({ videoId, transactions }: { videoId: string; transacti
               </div>
             </div>
 
-            <div className="space-y-4">
+            {/* <div className="space-y-4">
               <div className="flex gap-2">
                 <button
                   onClick={handleDisburseNFTs}
@@ -191,7 +191,7 @@ const DisburseRewards = ({ videoId, transactions }: { videoId: string; transacti
                   Disburse Tokens
                 </button>
               </div>
-            </div>
+            </div> */}
 
             <div className="mt-4 space-y-2">
               <h3 className="font-semibold">Contributors</h3>
