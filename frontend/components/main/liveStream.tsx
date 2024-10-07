@@ -1,9 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 const Live: React.FC = () => {
-  const [liveUrl, setLiveUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [dataDisplay, setDataDisplay] = useState<any[]>([]);
+  const location = useLocation();
+
+  useEffect(() => {
+    const url = location.state?.message || "";
+    if (url) {
+      submitLiveUrl(url);
+    }
+  }, [location.state]);
 
   const extractVideoId = (url: string) => {
     try {
@@ -25,9 +33,10 @@ const Live: React.FC = () => {
     return null;
   };
 
-  const submitLiveUrl = async () => {
-    const videoId = extractVideoId(liveUrl);
+  const submitLiveUrl = async (url: string) => {
+    const videoId = extractVideoId(url);
     if (videoId) {
+      setLoading(true);
       try {
         const response = await fetch("/api/start-monitoring", {
           method: "POST",
@@ -40,10 +49,12 @@ const Live: React.FC = () => {
         if (data.error) {
           alert(data.error);
         } else {
-          alert("Live URL submitted: " + liveUrl);
+          alert("Live URL submitted: " + url);
         }
       } catch (error) {
         alert("Error submitting live URL: " + error);
+      } finally {
+        setLoading(false);
       }
     } else {
       alert("Please enter a valid URL.");
@@ -53,25 +64,7 @@ const Live: React.FC = () => {
   return (
     <div className="text-center bg-gray-100 p-4">
       <div className="analytics-dashboard mt-6 bg-white p-4 rounded shadow">
-        <h2 className="text-2xl">Creator Dashboard</h2>
-        <div className="flex justify-around mt-4">
-          <div className="analytics-input-box text-black">
-            <h3 className="text-xl">Live chat data</h3>
-            <p>Start monitoring your live chat to see superchats and payments show up here in real-time.</p>
-            <div className="flex mt-2">
-              <input
-                type="text"
-                placeholder="Insert URL"
-                value={liveUrl}
-                onChange={(e) => setLiveUrl(e.target.value)}
-                className="flex-1 p-2 border rounded"
-              />
-              <button className="analytics-button ml-2 bg-red-600 text-white p-2 rounded" onClick={submitLiveUrl}>
-                Submit
-              </button>
-            </div>
-          </div>
-        </div>
+        <h2 className="text-2xl">Live Mode</h2>
 
         {loading && <div className="loading-indicator text-center mt-4">Loading...</div>}
         {dataDisplay.length > 0 && (

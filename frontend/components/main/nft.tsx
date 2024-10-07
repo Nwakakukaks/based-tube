@@ -124,157 +124,76 @@ const NFT = () => {
     setAmount(1);
   };
 
-  // Local Ref
-
-  // const isCollectionCreated = false;
   const { account, signAndSubmitTransaction } = useWallet();
 
   console.log(`collection map`, collections);
   return (
     <div className="bg-white rounded-none w-full shadow-md mx-auto border-2 border-black h-[460px] overflow-y-auto font-vt323">
-      <div className="h-6 bg-[#89e219] w-full flex justify-between px-2 ">
-        <p className="text-base font-semibold text-black">
-          {isCollectionCreated ? "NFT Template" : "Create New Collection"}
-        </p>
-        <img src="https://utfs.io/f/PKy8oE1GN2J3JMeRo2HVozIYU8DFRWmkp7SC4bh16KiGHZfv" alt="Logo" />
-      </div>
-
       <div className="p-3">
         <div className="rounded-sm">
           <img
-            src={
-              isCollectionCreated?.cdn_asset_uris?.cdn_image_uri ??
-              "https://utfs.io/f/PKy8oE1GN2J3pihxJUVwi394rogIqdXzW56n8bYJTPQ1MAjv"
-            }
+            src={"/icons/nft.svg"}
             alt="NFT aptos"
             className="w-full h-auto max-h-40 object-contain mb-2 "
           />
         </div>
+        // Collection Creation UI
+        <div className="grid grid-cols-2 gap-4 text-start text-black">
+          <DateTimeInput
+            id="mint-start"
+            label="Public mint start date"
+            tooltip="When minting becomes active"
+            disabled={isUploading || !account}
+            date={publicMintStartDate}
+            onDateChange={setPublicMintStartDate}
+            time={publicMintStartTime}
+            onTimeChange={() => setPublicMintStartTime}
+          />
+          <DateTimeInput
+            id="mint-end"
+            label="Public mint end date"
+            tooltip="When minting finishes"
+            disabled={isUploading || !account}
+            date={publicMintEndDate}
+            onDateChange={setPublicMintEndDate}
+            time={publicMintEndTime}
+            onTimeChange={() => setPublicMintEndTime}
+          />
 
-        {isCollectionCreated ? (
-          <>
-            <div className="flex flex-col gap-2 p-2 rounded-lg">
-              <div>
-                <p className="text-sm font-medium text-gray-800">NFT Name</p>
-                <p className="text-xl text-black font-bold ">{isCollectionCreated?.collection_name}</p>
-                <p className="text-xs text-gray-800">{isCollectionCreated?.description}</p>
-              </div>
+          <LabeledInput
+            id="mint-limit"
+            required
+            label="Mint limit per address"
+            tooltip="How many NFTs an individual address is allowed to mint"
+            disabled={isUploading || !account}
+            onChange={(e) => setPublicMintLimitPerAccount(parseInt(e.target.value))}
+          />
 
-              <div className="flex space-x-12 items-center">
-                <div>
-                  <p className="text-sm font-medium text-gray-800">Your Balance</p>
-                  <p className="text-xl text-black font-bold ">
-                    {clampNumber(totalMinted)} / {clampNumber(maxSupply)} Minted
-                  </p>
-                </div>
+          <LabeledInput
+            id="for-myself"
+            label="Mint for myself"
+            tooltip="How many NFTs to mint immediately for the creator"
+            disabled={isUploading || !account}
+            onChange={(e) => setPreMintAmount(parseInt(e.target.value))}
+          />
+        </div>
 
-                <div>
-                  <p className="text-sm font-medium text-gray-800">Total Supply</p>
-                  <p className="text-xl font-bold text-black">{maxSupply} Available</p>
-                </div>
-              </div>
-            </div>
-            <div className="px-1 py-2 flex flex-col">
-              <Label className="text-black font-semibold">Quantity:</Label>
-              <Input
-                id="mint-amount"
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(parseInt(e.target.value))}
-                className="flex-1 bg-transparent text-black rounded-none mt-1"
-              />
-              <button
-                onClick={handleNFT}
-                disabled={loading}
-                className={`mt-3 text-black text-xl bg-transparent font-bold py-1 rounded-sm w-full border border-black transition duration-300 ${loading ? "bg-gradient-to-r from-[#58cc02] to-white animate-pulse" : ""} ${success ? "bg-[#89e219]" : ""}`}
-              >
-                {loading ? "Minting..." : success ? <span className="text-white text-2xl mr-2">✓</span> : "Mint NFT"}
-              </button>
-            </div>
-          </>
-        ) : (
-          // NFT Minting UI
-
-          // Collection Creation UI
-          <div className="flex flex-col items-start justify-between py-2 gap-4 max-w-screen-xl mx-auto text-black">
-            <Card>
-              <CardHeader>
-                <CardDescription>Uploads collection files to Irys, a decentralized storage</CardDescription>
-              </CardHeader>
-              <CardContent>{/* File upload logic here */}</CardContent>
-            </Card>
-
-            <div className="flex flex-col item-center gap-4 mt-4">
-              <DateTimeInput
-                id="mint-start"
-                label="Public mint start date"
-                tooltip="When minting becomes active"
-                disabled={isUploading || !account}
-                date={publicMintStartDate}
-                onDateChange={setPublicMintStartDate}
-                time={publicMintStartTime}
-                onTimeChange={() => setPublicMintStartTime}
-              />
-              <DateTimeInput
-                id="mint-end"
-                label="Public mint end date"
-                tooltip="When minting finishes"
-                disabled={isUploading || !account}
-                date={publicMintEndDate}
-                onDateChange={setPublicMintEndDate}
-                time={publicMintEndTime}
-                onTimeChange={() => setPublicMintEndTime}
-              />
-            </div>
-
-            <LabeledInput
-              id="mint-limit"
-              required
-              label="Mint limit per address"
-              tooltip="How many NFTs an individual address is allowed to mint"
-              disabled={isUploading || !account}
-              onChange={(e) => setPublicMintLimitPerAccount(parseInt(e.target.value))}
-            />
-            <LabeledInput
-              id="royalty-percentage"
-              label="Royalty Percentage"
-              tooltip="The percentage of trading value that collection creator gets when an NFT is sold on marketplaces"
-              disabled={isUploading || !account}
-              onChange={(e) => setRoyaltyPercentage(parseInt(e.target.value))}
-            />
-            <LabeledInput
-              id="mint-fee"
-              label="Mint fee per NFT in APT"
-              tooltip="The fee the nft minter is paying the collection creator when they mint an NFT, denominated in APT"
-              disabled={isUploading || !account}
-              onChange={(e) => setPublicMintFeePerNFT(Number(e.target.value))}
-            />
-            <LabeledInput
-              id="for-myself"
-              label="Mint for myself"
-              tooltip="How many NFTs to mint immediately for the creator"
-              disabled={isUploading || !account}
-              onChange={(e) => setPreMintAmount(parseInt(e.target.value))}
-            />
-
-            <ConfirmButton
-              title="Create Collection"
-              className="self-start w-full bg-[#89e219]"
-              onSubmit={onCreateCollection}
-              disabled={!account || !files?.length || !publicMintStartDate || !publicMintLimitPerAccount || isUploading}
-              confirmMessage={
-                <>
-                  <p>The upload process requires at least 2 message signatures</p>
-                  <ol className="list-decimal list-inside">
-                    <li>To upload collection cover image file and NFT image files into Irys.</li>
-                    <li>To upload collection metadata file and NFT metadata files into Irys.</li>
-                  </ol>
-                  <p>In the case we need to fund a node on Irys, a transfer transaction submission is required also.</p>
-                </>
-              }
-            />
-          </div>
-        )}
+        <ConfirmButton
+          title="Create Collection"
+          className="self-start w-full bg-red-600 mt-4"
+          onSubmit={onCreateCollection}
+          disabled={!account || !files?.length || !publicMintStartDate || !publicMintLimitPerAccount || isUploading}
+          confirmMessage={
+            <>
+              <p>The upload process requires at least 2 message signatures</p>
+              <ol className="list-decimal list-inside">
+                <li>To upload collection cover image file and NFT image files into Irys.</li>
+                <li>To upload collection metadata file and NFT metadata files into Irys.</li>
+              </ol>
+              <p>In the case we need to fund a node on Irys, a transfer transaction submission is required also.</p>
+            </>
+          }
+        />
       </div>
     </div>
   );

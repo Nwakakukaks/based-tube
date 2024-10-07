@@ -4,7 +4,7 @@ import Live from "@/components/main/liveStream";
 export const LivePage = () => {
   return (
     <div>
-     <Live/>
+      <Live />
       <Assistant />
     </div>
   );
