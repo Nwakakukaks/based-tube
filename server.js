@@ -6,12 +6,6 @@ const bodyParser = require("body-parser");
 const axios = require("axios");
 const path = require("path");
 const fs = require("fs");
-const {
-  AccountTokenAuthProvider,
-  LightsparkClient,
-  InvoiceType,
-  BitcoinNetwork,
-} = require("@lightsparkdev/lightspark-sdk");
 const { google } = require("googleapis");
 const cors = require("cors");
 const { monitorLiveChat, eventEmitter } = require("./chatbot/messageMonitor");
@@ -48,16 +42,8 @@ app.use(cors());
 
 app.post("/send-message", async (req, res) => {
   const { message, amount, videoId, address } = req.body;
-  console.log("Received message:", message);
-  console.log("Amount:", amount);
-  console.log("Video ID:", videoId);
-  console.log("Aptos Address:", address);
 
   try {
-    // Check that video is actually live rn
-    const liveChatId = await getLiveChatId(videoId);
-    console.log("Live chat ID obtained:", liveChatId);
-
     const fullMessage = `⚡⚡ 𝗦𝗨𝗣𝗘𝗥𝗖𝗛𝗔𝗧 [${amount} APTO]: ${message.toUpperCase()}`;
     addValidMessage(fullMessage);
 
@@ -69,11 +55,17 @@ app.post("/send-message", async (req, res) => {
 });
 
 const validSuperchatsFile = path.join(__dirname, "chatbot", "validSuperchats.json");
+const validTransactionsFile = path.join(__dirname, "chatbot", "validTransactions.json");
 
 // Load valid superchats from file
 let validSuperchats = {};
 if (fs.existsSync(validSuperchatsFile)) {
   validSuperchats = JSON.parse(fs.readFileSync(validSuperchatsFile, "utf8"));
+}
+
+let validTransactions = [];
+if (fs.existsSync(validTransactionsFile)) {
+  validTransactions = JSON.parse(fs.readFileSync(validTransactionsFile, "utf8"));
 }
 
 app.post("/simulate-payment", async (req, res) => {
@@ -85,14 +77,6 @@ app.post("/simulate-payment", async (req, res) => {
       message: "All fields (message, amount, videoId, address) are required.",
     });
   }
-
-  console.log("Payment simulation request received:", {
-    message,
-    amount,
-    videoId,
-    address,
-    hash,
-  });
 
   try {
     const liveChatId = await getLiveChatId(videoId);
@@ -106,6 +90,18 @@ app.post("/simulate-payment", async (req, res) => {
     }
     validSuperchats[videoId].push(hash);
     fs.writeFileSync(validSuperchatsFile, JSON.stringify(validSuperchats, null, 2));
+
+    const transaction = {
+      amount,
+      videoId,
+      timestamp: new Date().toISOString(),
+      address,
+      transactionHash: hash,
+      message,
+    };
+
+    validTransactions.push(transaction);
+    fs.writeFileSync(validTransactionsFile, JSON.stringify(validTransactions, null, 2));
 
     // Update the payment status immediately
     res.json({
@@ -267,48 +263,6 @@ app.post("/start-monitoring", (req, res) => {
   } else {
     console.error("Invalid video ID received");
     res.json({ error: "Invalid video ID" });
-  }
-});
-
-// // Area to implement transaction messages
-app.post("/fetch-messages", async (req, res) => {
-  try {
-    const { address } = req.body;
-    const account = await lightsparkClient.getCurrentAccount();
-    if (!account) {
-      throw new Error("Unable to fetch the account.");
-    }
-
-    const transactionsConnection = await account.getTransactions(
-      lightsparkClient,
-      100, // Number of transactions to fetch
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      BitcoinNetwork.REGTEST,
-    );
-
-    const sentMessages = transactionsConnection.entities.filter(
-      (transaction) => transaction.typename === "OutgoingPayment",
-    );
-
-    // See what the lightspark api returns with this, could be useful
-    // console.log("Transaction Data:", JSON.stringify(sentMessages, null, 2));
-
-    const transactions = sentMessages.map((message) => ({
-      id: message.id,
-      amountUSD: message.amount.preferredCurrencyValueApprox, // USD
-      amountSatoshis: message.amount.originalValue / 1000, // Convert millisatoshis to satoshis
-      currency: message.amount.preferredCurrencyUnit,
-      timestamp: message.createdAt,
-      messageText: message.paymentRequestData?.memo || "No message", // paymentRequestData is where the message is
-    }));
-
-    res.json({ transactions });
-  } catch (error) {
-    console.error("Error fetching messages:", error);
-    res.status(500).json({ error: error.message });
   }
 });
 

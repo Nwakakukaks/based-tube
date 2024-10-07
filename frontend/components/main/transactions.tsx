@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Creator: React.FC = () => {
+const Transactions: React.FC = () => {
   const [videoUrl, setVideoUrl] = useState("");
   const [aptosAddress, setAptosAddress] = useState("");
   const [generatedUrl, setGeneratedUrl] = useState("");
@@ -179,4 +179,4 @@ const Creator: React.FC = () => {
   );
 };
 
-export default Creator;
+export default Transactions;

@@ -35,6 +35,8 @@ function isValidMessage(message) {
 //     return regex.test(message);
 // }
 
+const existingMessages = new Set(); // Set to track existing messages
+
 function isSuperchatFormat(message) {
   // The exact bold 𝗦𝗨𝗣𝗘𝗥𝗖𝗛𝗔𝗧 text in Unicode
   const exactBoldText = "𝗦𝗨𝗣𝗘𝗥𝗖𝗛𝗔𝗧";
@@ -46,6 +48,13 @@ function isSuperchatFormat(message) {
   // Basic format check
   if (!regex.test(message)) {
     return false;
+  }
+
+  // Check for duplicate messages
+  if (existingMessages.has(message)) {
+    return false; // Message is a duplicate
+  } else {
+    existingMessages.add(message); // Add new message to the set
   }
 
   // Additional security checks
@@ -82,19 +91,20 @@ function isSuperchatFormat(message) {
   // Message content should not be empty
   if (content.trim().length === 0) return false;
 
-  // Additional checks for common spoofing attempts
-  const messageLC = message.toLowerCase();
+  // Ensure the message is not in lowercase
+  if (/[a-z]/.test(content)) return false; // Check for lowercase in the content
 
-  // Check for additional lightning emojis beyond the first two
+  // Additional checks for common spoofing attempts
   const lightningCount = [...message].filter((char) => char === "⚡").length;
   if (lightningCount !== 2) return false;
 
   // Check for multiple occurrences of SUPERCHAT/APTO
-  if ((messageLC.match(/superchat/gi) || []).length > 1) return false;
-  if ((messageLC.match(/apto/gi) || []).length > 1) return false;
+  if ((message.match(/superchat/gi) || []).length > 1) return false;
+  if ((message.match(/apto/gi) || []).length > 1) return false;
 
   // Success - message passed all validation checks
   return true;
 }
+
 
 module.exports = { addValidMessage, isValidMessage, isSuperchatFormat };
