@@ -21,7 +21,9 @@ export function Header() {
           Aptopus
         </h3>
 
-        <div className="">
+        <div className=" flex items-center space-x-4">
+          {/* <p>Past Streams</p>
+          <p>Transactions </p> */}
           <WalletSelector />
         </div>
       </div>
