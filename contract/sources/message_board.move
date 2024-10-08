@@ -375,6 +375,15 @@ module message_board_addr::launchpad {
         fa_config.mint_enabled
     }
 
+    #[view]
+    /// Get the token balance for a specific address
+    public fun get_token_balance(
+        fa_obj: Object<Metadata>,
+        owner_addr: address,
+    ): u64 {
+        primary_fungible_store::balance(owner_addr, fa_obj)
+    }
+
     // ================================= Helper Functions ================================== //
 
     /// Check if sender is admin or owner of the object when package is published to object

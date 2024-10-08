@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import DynamicMint from "./token";
-import NFT from "./nft";
+// import NFT from "./nft";
 import { useNavigate } from "react-router-dom";
 import { toast } from "../ui/use-toast";
 
@@ -111,8 +111,8 @@ const Creator: React.FC = () => {
 
   const steps = [
     { title: "Begin Setup", content: <BeginSetup /> },
-    { title: "Create a contributor token", content: <DynamicMint /> },
-    { title: "Create an NFT badge for contributors", content: <NFT /> },
+    { title: "Create a membership token", content: <DynamicMint /> },
+    // { title: "Create an NFT badge for contributors", content: <NFT /> },
     { title: "Input Video Link and Address", content: renderInputForm() },
   ];
 

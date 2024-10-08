@@ -5,8 +5,6 @@ import { useNavigate } from "react-router-dom";
 export const Features = () => {
   const navigate = useNavigate();
 
-
-
   return (
     <>
       <div className="bg-black p-6">
@@ -53,7 +51,8 @@ export const Features = () => {
             </CardHeader>
             <CardContent>
               <img src="/icons/faucet.svg" className="h-12 w-12 bg-red-500 p-2 rounded-sm  ml-1 mb-3" />
-              Build and share faucet dapps to enable developers access your protocol's test tokens across any web platform.
+              Build and share faucet dapps to enable developers access your protocol's test tokens across any web
+              platform.
             </CardContent>
           </Card>
           <Card className="bg-transparent text-gray-400 border-gray-800 border-2 rounded-none">
@@ -62,7 +61,8 @@ export const Features = () => {
             </CardHeader>
             <CardContent>
               <img src="/icons/donation.svg" className="h-12 w-12 bg-red-500 p-2 rounded-sm  ml-1 mb-3" />
-              Create dapps to support your favorite projects and causes with secure, simple donation options leveraging APT Link.
+              Create dapps to support your favorite projects and causes with secure, simple donation options leveraging
+              APT Link.
             </CardContent>
           </Card>
           <Card className="bg-transparent text-gray-400 border-gray-800 border-2 rounded-none">
@@ -71,14 +71,12 @@ export const Features = () => {
             </CardHeader>
             <CardContent>
               <img src="/icons/payment.svg" className="h-12 w-12 bg-red-500 p-2 rounded-sm  ml-1 mb-3" />
-               Create payment dapps to send and receive payments effortlessly through on platforms, making transactions feel as easy as
-              chatting.
+              Create payment dapps to send and receive payments effortlessly through on platforms, making transactions
+              feel as easy as chatting.
             </CardContent>
           </Card>
         </div>
       </div>
-
-     
     </>
   );
 };

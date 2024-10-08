@@ -6,7 +6,7 @@ export const VOTING_MODULE_ADDRESS = "0xdd71645e95789f143af6fd1b3ed37164378faea3
 
 // Module for Token Minting
 // TOKEN MINTING MODULE 0x2b57f5d66f3679e669ce68ca9d31f8acc2a828b9a6055f40f6878b2218c9405e
-export const T_MINTING_MODULE = "0x94ab41e40326b5df31c1a778b5bd892b2a9a2375dddaf8562fcf8e82d12d2ea4";
+export const T_MINTING_MODULE = "0x8652121c8284a3b4b4bf5a9440a3871aae4f6c7f666798d4c29dec04dcfbdff7";
 // Addr for Tokens
 export const FA_ADDRESS = "";
 

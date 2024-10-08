@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Loader2, Award, Coins, CheckCircle2, BadgeHelp } from "lucide-react";
+import { Loader2, CheckCircle2 } from "lucide-react";
 import { aptosClient } from "@/utils/aptosClient";
-import { mintNFT } from "@/entry-functions/mint_nft";
+// import { mintNFT } from "@/entry-functions/mint_nft";
 import { mintAsset } from "@/entry-functions/mint_asset";
 import { toast } from "@/components/ui/use-toast";
 import { useGetCollections } from "@/hooks/useGetCollections";
@@ -55,14 +55,14 @@ const DisburseRewards = ({ videoId, transactions }: { videoId: string; transacti
       for (const address of uniqueAddresses) {
         setStatus((prev) => ({ ...prev, [address]: "pending" }));
         try {
-          const response = await signAndSubmitTransaction(
-            mintNFT({
-              collectionId: collection.collection_id,
-              amount: 1,
-              address: address,
-            }),
-          );
-          await aptosClient().waitForTransaction({ transactionHash: response.hash });
+        //   const response = await signAndSubmitTransaction(
+        //     mintNFT({
+        //       collectionId: collection.collection_id,
+        //       amount: 1,
+        //       address: address,
+        //     }),
+        //   );
+        //   await aptosClient().waitForTransaction({ transactionHash: response.hash });
           setStatus((prev) => ({ ...prev, [address]: "success" }));
         } catch (error) {
           allSuccess = false; // Mark as not all succeeded

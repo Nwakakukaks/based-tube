@@ -4,16 +4,15 @@ import { NFT_MODULE_ADDRESS } from "@/constants";
 export type MintNftArguments = {
   collectionId: string;
   amount: number;
-  address: string;
 };
 
 export const mintNFT = (args: MintNftArguments): InputTransactionData => {
-  const { collectionId, amount, address } = args;
+  const { collectionId, amount } = args;
   return {
     data: {
       function: `${NFT_MODULE_ADDRESS}::vestpad::mint_nft`,
       typeArguments: [],
-      functionArguments: [collectionId, amount, address],
+      functionArguments: [collectionId, amount],
     },
   };
 };
