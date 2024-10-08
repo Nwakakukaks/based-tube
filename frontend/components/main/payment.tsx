@@ -119,7 +119,7 @@ const Payment: React.FC = () => {
   return (
     <div className="container mx-auto p-4">
       <div className={`bg-white rounded-lg shadow-md p-6`}>
-        <h1 className="text-2xl text-red-600">Aptopus 🐙</h1>
+        <h1 className="text-2xl text-blue-600">Aptopus 🐙</h1>
         <Input
           name="message"
           placeholder="Enter your Superchat message"
@@ -141,7 +141,7 @@ const Payment: React.FC = () => {
           id="send-superchat-button"
           onClick={sendSuperchat} // Change to call sendSuperchat
           disabled={loading}
-          className={`w-full bg-gradient-to-br from-red-600 to-red-800 text-white rounded p-2 transition-all duration-300 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
+          className={`w-full bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded p-2 transition-all duration-300 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
         >
           {loading ? "Sending..." : "Send Superchat"}
         </Button>

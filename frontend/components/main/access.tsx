@@ -29,6 +29,8 @@ const Access = () => {
     { name: "YouTube", requiredBalance: 1 },
     { name: "Medium", requiredBalance: 1 },
     { name: "Substack", requiredBalance: 1 },
+    { name: "Instagram", requiredBalance: 1 },
+    { name: "Farcaster", requiredBalance: 1 },
   ];
 
   const generateRandomString = (prefix: any, length = 8) => {
@@ -126,7 +128,7 @@ const Access = () => {
       case "checking":
         return "Checking for creator token...";
       default:
-        return `Access ${platform.name}`;
+        return ` ${platform.name}`;
     }
   };
 

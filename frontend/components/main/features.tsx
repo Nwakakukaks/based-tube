@@ -7,72 +7,81 @@ export const Features = () => {
 
   return (
     <>
-      <div className="bg-black p-6">
-        <p className="text-center text-4xl font-semibold w-2/4 mx-auto mt-6">Discover Key Use Cases for Aptopuss</p>
-        <div className="grid grid-cols-2 gap-3 mt-6">
-          <Card className="bg-transparent text-gray-400 border-gray-800 border-2 rounded-none">
+      <div className="space-y-20 p-6">
+        <div className="my-6">
+          <p className="text-gray-400 text-sm text-center">Trusted and loved by creators like </p>
+          <div className="flex justify-between space-x-4 mt-6 font-medium text-2xl text-gray-500 max-w-4xl mx-auto">
+            <p>MR BEAST</p>
+            <p>POdIPE</p>
+            <p>Think Media</p>
+            <p>CNN+</p>
+            <p>NatGEO Charity</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-6">
+          <p className="text-4xl font-semibold">
+            Explore Case studies of how creators have 10X their revenue using Aptopus
+          </p>
+
+          <div className="space-y-5">
+            <p className="text-xs text-gray-400">
+              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolore enim dignissimos veniam temporibus.
+              Molestias, aliquam? Fuga nisi eius rerum consectetur ex non perferendis architecto nihil iusto, dolore
+              quibusdam, voluptatem natus nemo magni dignissimos dicta quasi ut reprehenderit deleniti. Veniam quos
+              ullam corrupti ratione perspiciatis. Dolorum atque molestias facilis quia deserunt.
+            </p>
+            <Button className="rounded-full text-xs">Learn more</Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3 mt-6">
+          <Card className="bg-transparent text-gray-400 border-gray-800 border-none rounded-none">
             <CardHeader>
-              <CardTitle className="text-white">Bridging Assets</CardTitle>
+              <CardTitle>
+                <div className="flex items-center">
+                  <img src="/icons/instant.svg" className="h-16 w-16 p-2 rounded-sm" />
+                </div>
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex space-x-1 items-center mb-3">
-                <img src="/icons/dollar.svg" className="h-12 w-12 bg-red-500 p-2 rounded-sm" />
-                <img src="/icons/double-arrow.svg" className="h-10 w-10 bg-gray-100 " />
-                <img src="/icons/euro.svg" className="h-12 w-12 bg-red-500 p-2 rounded-sm " />
-              </div>
-
-              <p>
-                Create bridges to enable assets transfer across different networks, simplifying cross-chain
-                transactions.
+              <p className="text-white mb-3 text-lg font-medium">Instant Settlements</p>
+              <p className="text-gray-400 text-sm">
+                Creators receive their payments instantly, directly to their wallets, eliminating any middlemen.
               </p>
             </CardContent>
           </Card>
-          <Card className="bg-transparent text-gray-400 border-gray-800 border-2 rounded-none">
+
+          <Card className="bg-transparent text-gray-400 border-gray-800 border-none rounded-none">
             <CardHeader>
-              <CardTitle className="text-white">Token Transfers</CardTitle>
+              <CardTitle>
+                <div className="flex items-center">
+                  <img src="/icons/wallet.svg" className="h-16 w-16 p-2 rounded-sm" />
+                </div>
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <img src="/icons/token.svg" className="h-12 w-12 bg-red-500 p-2 rounded-sm  ml-1 mb-3" />
-              Create dapps enabling token transfer between wallets, enhancing your trading and investment experience.
+              <p className="text-white mb-3 text-lg font-medium">No Percentage Fee</p>
+              <p className="text-gray-400 text-sm">
+                Keep 100% of your earnings—unlike platforms like YouTube that take up to 30% of superchats.
+              </p>
             </CardContent>
           </Card>
-          <Card className="bg-transparent text-gray-400 border-gray-800 border-2 rounded-none">
+
+          <Card className="bg-transparent text-gray-400 border-gray-800 border-none rounded-none">
             <CardHeader>
-              <CardTitle className="text-white">Simple Swaps</CardTitle>
+              <CardTitle>
+                <div className="flex items-center">
+                  <img src="/icons/member.svg" className="h-16 w-16 p-2 rounded-sm" />
+                </div>
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <img src="/icons/swap.svg" className="h-12 w-12 bg-red-500 p-2 rounded-sm  ml-1 mb-3" />
-              Create dapps to swap tokens on any platform with minimal fees for a convenient trading experience.
-            </CardContent>
-          </Card>
-          <Card className="bg-transparent text-gray-400 border-gray-800 border-2 rounded-none">
-            <CardHeader>
-              <CardTitle className="text-white">Faucets for Developers</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <img src="/icons/faucet.svg" className="h-12 w-12 bg-red-500 p-2 rounded-sm  ml-1 mb-3" />
-              Build and share faucet dapps to enable developers access your protocol's test tokens across any web
-              platform.
-            </CardContent>
-          </Card>
-          <Card className="bg-transparent text-gray-400 border-gray-800 border-2 rounded-none">
-            <CardHeader>
-              <CardTitle className="text-white">Easy Donations</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <img src="/icons/donation.svg" className="h-12 w-12 bg-red-500 p-2 rounded-sm  ml-1 mb-3" />
-              Create dapps to support your favorite projects and causes with secure, simple donation options leveraging
-              APT Link.
-            </CardContent>
-          </Card>
-          <Card className="bg-transparent text-gray-400 border-gray-800 border-2 rounded-none">
-            <CardHeader>
-              <CardTitle className="text-white">Social Payments</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <img src="/icons/payment.svg" className="h-12 w-12 bg-red-500 p-2 rounded-sm  ml-1 mb-3" />
-              Create payment dapps to send and receive payments effortlessly through on platforms, making transactions
-              feel as easy as chatting.
+              <p className="text-white mb-3 text-lg font-medium">Exclusive Memberships</p>
+              <p className="text-gray-400 text-sm">
+                Create tokens to reward your supporters, granting them access to exclusive content across platforms like
+                Patreon and Substack.
+              </p>
             </CardContent>
           </Card>
         </div>

@@ -1,8 +1,10 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { WalletSelector } from "./WalletSelector";
+import { Button } from "../ui/button";
 
 export function Header() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleHome = () => {
     navigate("/");
@@ -10,8 +12,8 @@ export function Header() {
 
   return (
     <>
-      <div className="w-full bg-red-500 p-1">
-        <p className="text-sm text-center text-white">
+      <div className="w-full bg-blue-200 p-1">
+        <p className="text-xs text-center text-black">
           We appreciate you exploring our beta! Your feedback helps us grow and improve.
         </p>
       </div>
@@ -21,10 +23,18 @@ export function Header() {
           Aptopus
         </h3>
 
+        <div className="flex items-center space-x-8 text-sm font-medium mt-1">
+          <p className="cursor-pointer">Company</p>
+          <p className="cursor-pointer">Product</p>
+          <p className="cursor-pointer">Contact us</p>
+        </div>
+
         <div className=" flex items-center space-x-4">
-          {/* <p>Past Streams</p>
-          <p>Transactions </p> */}
-          <WalletSelector />
+          {location.pathname === "/" ? (
+            <Button className="bg-blue-600 rounded-full py-3 px-8 hover:bg-blue-300">Login</Button>
+          ) : (
+            <WalletSelector />
+          )}
         </div>
       </div>
     </>

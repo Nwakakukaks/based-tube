@@ -14,7 +14,7 @@ const Creator: React.FC = () => {
 
   const renderInputForm = () => (
     <div className="form-container bg-gray-200 rounded-lg p-6 shadow-lg">
-      <h1 className="text-2xl text-red-600">Create your Creator link</h1>
+      <h1 className="text-2xl text-blue-600">Create your Creator link</h1>
       <p>Generate a unique URL and pin it in your live chat</p>
       <input
         type="text"
@@ -31,7 +31,7 @@ const Creator: React.FC = () => {
         className="mt-4 p-2 border rounded text-gray-900"
       />
       <button
-        className="submit-button mt-4 bg-red-600 text-white p-2 rounded hover:bg-red-700"
+        className="submit-button mt-4 bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
         onClick={generateSuperchatUrl}
       >
         Generate Creator Link

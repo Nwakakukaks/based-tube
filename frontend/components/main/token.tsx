@@ -348,10 +348,10 @@ const DynamicMint = () => {
               disabled={loading}
               className={`w-full ${
                 loading
-                  ? "bg-gradient-to-r from-red-600 to-white animate-pulse"
+                  ? "bg-gradient-to-r from-blue-600 to-white animate-pulse"
                   : success
-                    ? "bg-red-600"
-                    : "bg-red-600 hover:bg-red-400"
+                    ? "bg-blue-600"
+                    : "bg-blue-600 hover:bg-blue-400"
               } text-white font-bold py-2 px-4 rounded`}
             >
               {loading ? "Processing..." : success ? "✓ Done!" : "Create Token"}
