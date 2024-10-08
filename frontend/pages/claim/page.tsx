@@ -1,11 +1,9 @@
-
 import Claim from "@/components/main/claim";
 
 export const ClaimPage = () => {
   return (
-    <div>
+    <div className="h-[70vh] flex justify-center items-center ">
       <Claim />
-      
     </div>
   );
 };

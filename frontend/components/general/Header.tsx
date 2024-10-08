@@ -10,6 +10,10 @@ export function Header() {
     navigate("/");
   };
 
+  const handleLogin = () => {
+    navigate("/dashboard");
+  };
+
   return (
     <>
       <div className="w-full bg-red-50 p-1">
@@ -23,15 +27,19 @@ export function Header() {
           Aptopus
         </h3>
 
-        <div className="flex items-center space-x-8 text-sm font-medium mt-1">
-          <p className="cursor-pointer">Company</p>
-          <p className="cursor-pointer">Product</p>
-          <p className="cursor-pointer">Contact us</p>
-        </div>
+        {location.pathname === "/" && (
+          <div className="flex items-center space-x-8 text-sm font-medium mt-1">
+            <p className="cursor-pointer">Company</p>
+            <p className="cursor-pointer">Product</p>
+            <p className="cursor-pointer">Contact us</p>
+          </div>
+        )}
 
         <div className=" flex items-center space-x-4">
           {location.pathname === "/" ? (
-            <Button className="bg-red-600 rounded-full py-3 px-8 hover:bg-red-300">Login</Button>
+            <Button onClick={handleLogin} className="bg-red-600 rounded-full py-3 px-8 hover:bg-red-300">
+              Login
+            </Button>
           ) : (
             <WalletSelector />
           )}

@@ -2,7 +2,6 @@ import { useLocation } from "react-router-dom";
 
 export function LFooter() {
   const location = useLocation();
-  const showIcon = location.pathname === "/";
 
   return (
     <>
@@ -14,13 +13,7 @@ export function LFooter() {
           </p>
         </div>
         <div className="flex space-x-3 items-center">
-          {showIcon && (
-            <img
-              src="/icons/Twitter X.svg"
-              className="bg-white rounded-sm w-6 h-6 mr-4"
-              alt="Twitter"
-            />
-          )}
+          <img src="/icons/Twitter X.svg" className="bg-white rounded-sm w-6 h-6 mr-4" alt="Twitter" />
         </div>
       </div>
 

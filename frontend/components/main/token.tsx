@@ -154,7 +154,7 @@ const DynamicMint = () => {
     setError(null);
 
     if (!asset) {
-      return   toast({
+      return toast({
         title: "Error",
         description: `Asset not found`,
       });
@@ -184,7 +184,7 @@ const DynamicMint = () => {
       }),
     );
 
-   const claim = await aptosClient().waitForTransaction({ transactionHash: response.hash });
+    const claim = await aptosClient().waitForTransaction({ transactionHash: response.hash });
     queryClient.invalidateQueries();
 
     if (claim.success) {
@@ -199,66 +199,26 @@ const DynamicMint = () => {
   useEffect(() => {}, [tokenHash]);
 
   return (
-    <div className="bg-white rounded-none w-full shadow-md mx-auto border-2 border-black h-[460px] font-vt323 overflow-y-auto">
+    <div className=" rounded-none w-[90%] shadow-md mx-auto border-2 border-gray-600 h-full overflow-y-auto p-4 mb-6">
       {location.pathname === "/dashboard" ? (
         <div className="p-4">
-          <div className=" flex  items-center justify-center rounded-sm">
+          <div className=" flex flex-col items-center justify-center rounded-sm mt-1">
             <img
               src={previewImage ? previewImage : "/icons/upload.svg"}
               alt={`icon`}
               className=" max-w-24 h-auto max-h-40 object-contain mb-4 rounded-full overflow-hidden"
             />
-          </div>
 
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name">Token Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder="Enter token name"
-                  className="text-gray-800"
-                />
-              </div>
-              <div>
-                <Label htmlFor="symbol">Token Symbol</Label>
-                <Input
-                  id="symbol"
-                  name="symbol"
-                  value={formData.symbol}
-                  onChange={handleInputChange}
-                  placeholder="Enter token symbol"
-                  className="text-gray-800"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="decimals">Decimals</Label>
-              <Input
-                id="decimals"
-                name="decimals"
-                type="number"
-                value={formData.decimals}
-                onChange={handleInputChange}
-                placeholder="Enter number of decimal places"
-                className="text-gray-800"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="icon_upload">Token Icon</Label>
-              <div className="flex items-center space-x-2 mt-1">
+            <div className="mt-1">
+            
+              <div className="flex items-center space-x-2 my-1">
                 <Button
                   onClick={() => fileInputRef.current?.click()}
                   variant="outline"
-                  className="flex items-center text-black"
+                  className="flex items-center bg-transparent text-white"
                 >
                   <Upload className="w-4 h-4 mr-2" />
-                  Upload Icon
+                  Icon
                 </Button>
                 <Input
                   id="icon_upload"
@@ -271,10 +231,50 @@ const DynamicMint = () => {
                 />
               </div>
             </div>
+          </div>
 
-            <div className="flex items-center space-x-2 my-3">
-              <Checkbox id="advanced" checked={showAdvanced} onCheckedChange={() => setShowAdvanced(!showAdvanced)} />
-              <Label htmlFor="advanced" className="text-black">
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4 text-start">
+              <div>
+                <Label className="text-gray-100" htmlFor="name">Token Name</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="Enter token name"
+                  className="text-gray-800 bg-transparent rounded-sm mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-gray-100" htmlFor="symbol">Token Symbol</Label>
+                <Input
+                  id="symbol"
+                  name="symbol"
+                  value={formData.symbol}
+                  onChange={handleInputChange}
+                  placeholder="Enter token symbol"
+                  className="text-gray-800 bg-transparent rounded-sm mt-1"
+                />
+              </div>
+            </div>
+
+            <div className="mt-4 text-start">
+              <Label className="text-gray-100" htmlFor="decimals">Decimals</Label>
+              <Input
+                id="decimals"
+                name="decimals"
+                type="number"
+                value={formData.decimals}
+                onChange={handleInputChange}
+                placeholder="Enter number of decimal places"
+                className="text-gray-800 bg-transparent rounded-sm mt-1"
+              />
+            </div>
+
+            <div className="flex items-center space-x-2 my-6">
+              <Checkbox className=" bg-white" id="advanced" checked={showAdvanced} onCheckedChange={() => setShowAdvanced(!showAdvanced)} />
+              <Label className="text-gray-100" htmlFor="advanced">
                 Show advanced options
               </Label>
             </div>
@@ -282,7 +282,7 @@ const DynamicMint = () => {
             {showAdvanced && (
               <div className="space-y-4 border-t pb-4">
                 {/* <div>
-                  <Label htmlFor="project_uri">Project URI</Label>
+                  <Label className="text-gray-100" htmlFor="project_uri">Project URI</Label>
                   <Input
                     id="project_uri"
                     name="project_uri"
@@ -293,7 +293,7 @@ const DynamicMint = () => {
                 </div> */}
                 {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="mint_fee_per_smallest_unit_of_fa">Mint Fee</Label>
+                    <Label className="text-gray-100" htmlFor="mint_fee_per_smallest_unit_of_fa">Mint Fee</Label>
                     <Input
                       id="mint_fee_per_smallest_unit_of_fa"
                       name="mint_fee_per_smallest_unit_of_fa"
@@ -304,7 +304,7 @@ const DynamicMint = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="pre_mint_amount">Pre-mint Amount</Label>
+                    <Label className="text-gray-100" htmlFor="pre_mint_amount">Pre-mint Amount</Label>
                     <Input
                       id="pre_mint_amount"
                       name="pre_mint_amount"
@@ -315,9 +315,9 @@ const DynamicMint = () => {
                     />
                   </div>
                 </div> */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 text-start">
                   <div>
-                    <Label htmlFor="mint_limit_per_addr">Mint Limit per Address</Label>
+                    <Label className="text-gray-100" htmlFor="mint_limit_per_addr">Mint Limit per Address</Label>
                     <Input
                       id="mint_limit_per_addr"
                       name="mint_limit_per_addr"
@@ -325,11 +325,11 @@ const DynamicMint = () => {
                       value={formData.mint_limit_per_addr}
                       onChange={handleInputChange}
                       placeholder="Mint limit per address"
-                      className="text-gray-800"
+                      className="text-gray-800 bg-transparent rounded-sm mt-1"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="max_supply">Max Supply</Label>
+                    <Label className="text-gray-100" htmlFor="max_supply">Max Supply</Label>
                     <Input
                       id="max_supply"
                       name="max_supply"
@@ -337,7 +337,7 @@ const DynamicMint = () => {
                       value={formData.max_supply}
                       onChange={handleInputChange}
                       placeholder="Enter max supply (optional)"
-                      className="text-gray-800"
+                      className="text-gray-800 bg-transparent rounded-sm mt-1"
                     />
                   </div>
                 </div>
@@ -346,23 +346,23 @@ const DynamicMint = () => {
             <Button
               onClick={onCreateAsset}
               disabled={loading}
-              className={`w-full ${
+              className={`w-full text-lg mt-4 ${
                 loading
-                  ? "bg-gradient-to-r from-red-600 to-white animate-pulse"
+                  ? "bg-gradient-to-r from-red-500 to-white animate-pulse"
                   : success
-                    ? "bg-red-600"
-                    : "bg-red-600 hover:bg-red-400"
-              } text-white font-bold py-2 px-4 rounded`}
+                    ? ""
+                    : ""
+              } text-black bg-slate-50 hover:bg-slate-50 font-bold py-2 px-4 rounded`}
             >
               {loading ? "Processing..." : success ? "✓ Done!" : "Create Token"}
             </Button>
 
-            {/* <p className="text-black">Token: {asset?.asset_type}</p> */}
+            {/* <p className="text-white">Token: {asset?.asset_type}</p> */}
           </>
         </div>
       ) : (
-        <div className="space-y-2">
-          <div className=" flex  items-center justify-center rounded-sm">
+        <div className="space-y-6 p-6">
+          <div className=" flex  items-center justify-center rounded-sm mt-1">
             <img
               src={asset ? asset.icon_uri : "/icons/placeh.svg"}
               alt={`icon`}
@@ -372,7 +372,7 @@ const DynamicMint = () => {
 
           <div className="flex flex-col gap-6">
             <div>
-              <Label htmlFor="quantity" className=" font-medium text-black text-lg">
+              <Label className="text-gray-100 font-medium text-lg" htmlFor="quantity"  >
                 Quantity to Mint
               </Label>
               <Input
@@ -382,7 +382,7 @@ const DynamicMint = () => {
                 value={formData.quantity}
                 onChange={handleInputChange}
                 placeholder="Enter quantity to mint"
-                className="bg-transparent text-black rounded-none mt-1"
+                className="bg-transparent text-white rounded-none mt-1"
               />
             </div>
           </div>
@@ -390,29 +390,29 @@ const DynamicMint = () => {
           <div className="flex flex-col gap-3 p-2 rounded-lg">
             <div className="flex space-x-3 items-center text-start justify-between">
               <div>
-                <p className="font-medium text-gray-700">Claimable Token</p>
-                <p className="text-xl font-bold text-black ">
+                <p className="font-medium text-gray-400">Claimable Token</p>
+                <p className="text-xl font-bold text-gray-100 ">
                   {Math.min(userMintBalance, maxSupply - currentSupply)}
-                  <span className=" font-medium text-gray-900 ml-1">{asset?.symbol}</span>
+                  <span className=" font-medium text-gray-200 ml-1">{asset?.symbol}</span>
                 </p>
-                <p className="text-xs text-gray-700">Available to claim</p>
+                <p className="text-xs text-gray-400">Available to claim</p>
               </div>
 
               <div>
-                <p className="font-medium text-gray-700">Your Balance</p>
-                <p className="text-xl font-bold text-black ">
+                <p className="font-medium text-gray-400">Your Balance</p>
+                <p className="text-xl font-bold text-gray-100 ">
                   {yourBalance}
-                  <span className=" font-medium text-gray-900 ml-1">{asset?.symbol}</span>
+                  <span className=" font-medium text-gray-200 ml-1">{asset?.symbol}</span>
                 </p>
-                <p className="text-xs text-gray-700">Current Holdings</p>
+                <p className="text-xs text-gray-400">Current Holdings</p>
               </div>
 
               <div>
-                <p className="font-medium text-gray-700">Total Supply</p>
-                <p className="text-xl font-bold text-black ">
+                <p className="font-medium text-gray-400">Total Supply</p>
+                <p className="text-xl font-bold text-gray-100 ">
                   {currentSupply} / {maxSupply}
                 </p>
-                <p className="text-xs text-gray-700">Claimed / Max Supply</p>
+                <p className="text-xs text-gray-400">Claimed / Max Supply</p>
               </div>
             </div>
           </div>
@@ -423,13 +423,13 @@ const DynamicMint = () => {
               onClick={mintFA}
               disabled={loading}
               className={`w-full ${
-                loading ? "bg-gradient-to-r from-[#58cc02] to-white animate-pulse" : success ? "" : ""
-              } text-black text-xl font-bold py-1 px-4 rounded border border-black `}
+                loading ? "bg-gradient-to-r from-red-500 to-white animate-pulse" : success ? "" : ""
+              } text-black text-lg font-bold py-1 px-4 rounded border border-black `}
             >
               {loading ? "Claiming..." : success ? "✓ Claimed Successfully!" : "Claim Token"}
             </Button>
 
-            {/* <div className="flex justify-between items-center text-gray-900">
+            {/* <div className="flex justify-between items-center text-gray-200">
               <span>Token Address:</span>
               <a
                 className="text-red-500 hover:underline truncate max-w-[200px]"

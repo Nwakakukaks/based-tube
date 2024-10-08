@@ -19,19 +19,11 @@ export const HeroSection = () => {
       </p>
 
       <div className="flex items-center space-x-3">
-        <Button
-          onClick={handleGetStarted}
-          size={"lg"}
-          className="bg-red-600 rounded-full hover:bg-red-300 text-white"
-        >
+        <Button onClick={handleGetStarted} size={"lg"} className="bg-red-600 rounded-full hover:bg-red-300 text-white">
           Get Started Now
         </Button>
 
-        <Button
-          onClick={handleGetStarted}
-          
-          className="bg-transparent hover:bg-transparent rounded-full text-white"
-        >
+        <Button className="bg-transparent hover:bg-transparent rounded-full text-white">
           <img className="h-7 w-7 mr-1" src="/icons/video.svg" />
           Watch video
         </Button>

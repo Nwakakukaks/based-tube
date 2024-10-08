@@ -5,6 +5,10 @@ import { useNavigate } from "react-router-dom";
 export const Features = () => {
   const navigate = useNavigate();
 
+ const handleNavigate = () => {
+  navigate('/dashboard')
+  }
+
   return (
     <>
       <div className="space-y-20 p-6">
@@ -21,15 +25,16 @@ export const Features = () => {
 
         <div className="grid grid-cols-2 gap-6">
           <p className="text-4xl font-semibold">
-            Explore Case studies of how creators have 10X their revenue using Aptopus
+            Explore case studies of how creators have 10X their revenue using Aptopus
           </p>
 
           <div className="space-y-5">
             <p className="text-xs text-gray-400">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolore enim dignissimos veniam temporibus.
-              Molestias, aliquam? Fuga nisi eius rerum consectetur ex non perferendis architecto nihil iusto, dolore
-              quibusdam, voluptatem natus nemo magni dignissimos dicta quasi ut reprehenderit deleniti. Veniam quos
-              ullam corrupti ratione perspiciatis. Dolorum atque molestias facilis quia deserunt.
+              Meet Alex, a passionate content creator who struggled to monetize his art. After discovering Aptopus, he
+              implemented its tools to launch exclusive membership tiers. Within months, his monthly revenue skyrocketed
+              as fans eagerly subscribed for behind-the-scenes content. By engaging directly with his community through
+              personalized tokens, Alex transformed his passion into a thriving business, proving that with the right
+              platform, dreams can become reality.
             </p>
             <Button className="rounded-full text-xs">Learn more</Button>
           </div>
