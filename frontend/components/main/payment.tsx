@@ -53,13 +53,14 @@ const Payment: React.FC = () => {
     const transferAmount = Math.floor(parseFloat(amount) * Math.pow(10, 8)); // Use parseFloat
 
     if (isNaN(transferAmount) || transferAmount <= 0) {
-      alert("Please enter a valid amount.");
+      toast({
+        title: 'Wrong number format',
+        description: 'Please enter a valid number'
+      })
       setLoading(false);
       return;
     }
 
-    console.log("Amount entered:", amount);
-    console.log("Transfer amount (in smallest unit):", transferAmount);
 
     try {
       const committedTransaction = await signAndSubmitTransaction(
@@ -117,8 +118,8 @@ const Payment: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <div className={`bg-white rounded-lg shadow-md p-6`}>
+    <div className="flex justify-center items-center mx-auto h-[75vh]">
+      <div className={`bg-white rounded-lg shadow-md px-6 py-12 w-[85%]`}>
         <h1 className="text-2xl text-red-600">Aptopus 🐙</h1>
         <Input
           name="message"
@@ -131,15 +132,15 @@ const Payment: React.FC = () => {
         />
         <Input
           name="amount"
-          placeholder="Amount in sats"
-          type="number" // Change input type to number
+          placeholder="Amount in APTOS"
+          type="number"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           className="w-full border rounded p-2 mt-2 mb-4 text-gray-800"
         />
         <Button
           id="send-superchat-button"
-          onClick={sendSuperchat} // Change to call sendSuperchat
+          onClick={sendSuperchat} 
           disabled={loading}
           className={`w-full bg-gradient-to-br from-red-600 to-red-800 text-white rounded p-2 transition-all duration-300 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
         >

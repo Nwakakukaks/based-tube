@@ -40,9 +40,9 @@ const Streams: React.FC = () => {
 
 
   return (
-    <div className="text-center bg-gray-100 p-4 text-gray-800">
-      <div className="analytics-dashboard mt-6 bg-white p-4 rounded shadow">
-        <h2 className="text-2xl">Past Streams</h2>
+
+      <div className=" mt-6 text-gray-100 p-4 rounded shadow overflow-y-auto h-[100vh]">
+        <h2 className="text-xl">Past Streams</h2>
 
         {loading && <div className="loading-indicator text-center mt-4">Loading...</div>}
 
@@ -62,7 +62,7 @@ const Streams: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+   
   );
 };
 

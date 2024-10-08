@@ -149,12 +149,12 @@ const DisburseRewards = ({ videoId, transactions }: { videoId: string; transacti
 
   return (
     <div className="bg-white rounded-none w-full shadow-md mx-auto border-2 border-black font-vt323">
-      <div className="h-6 bg-[#89e219] w-full flex justify-between px-2">
+      <div className="h-6 bg-red-500 w-full flex justify-between px-2">
         <p className="text-base font-semibold text-black">{videoId}</p>
         {/* <img src="https://utfs.io/f/PKy8oE1GN2J3JMeRo2HVozIYU8DFRWmkp7SC4bh16KiGHZfv" alt="Logo" /> */}
       </div>
 
-      <div className="p-4">
+      <div className="p-4 text-center">
         <Card>
           <CardHeader className="pb-3">
             <h2 className="text-lg font-bold">Stream Summary</h2>
@@ -193,7 +193,7 @@ const DisburseRewards = ({ videoId, transactions }: { videoId: string; transacti
               </div>
             </div> */}
 
-            <div className="mt-4 space-y-2">
+            <div className="mt-4 space-y-2 text-center">
               <h3 className="font-semibold">Contributors</h3>
               {uniqueAddresses.map((address) => (
                 <div key={address} className="flex items-center justify-between p-2 border border-gray-200">

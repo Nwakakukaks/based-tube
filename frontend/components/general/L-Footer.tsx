@@ -9,7 +9,7 @@ export function LFooter() {
         <div>
           <p className="text-red-500 font-semibold text-lg">Aptopus</p>
           <p className="text-xs text-gray-500 w-48 lg:w-96">
-            Create and get shareable dapp links on any web environment. Access all the possibilities on Aptos.
+            Create unique links to recieve aptos tokens from your viewers during live streams.
           </p>
         </div>
         <div className="flex space-x-3 items-center">

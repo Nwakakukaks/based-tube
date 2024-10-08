@@ -253,6 +253,37 @@ app.get("/c/:shortCode", async (req, res) => {
   }
 });
 
+
+app.get("/a/:shortCode", async (req, res) => {
+  const { shortCode } = req.params;
+
+  const urlData = shortUrls[shortCode];
+
+  if (!urlData) {
+    console.log("Short URL not found for code:", shortCode);
+    return res.status(404).json({
+      error: "Short URL not found",
+      code: "NOT_FOUND",
+    });
+  }
+
+  try {
+    const accessUrl = `http://localhost:5173/access?vid=${urlData.videoId}&lnaddr=${urlData.address}`;
+    console.log("Generated access URL:", accessUrl);
+
+    return res.status(200).json({
+      url: accessUrl,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error generating access URL:", error);
+    return res.status(500).json({
+      error: "Failed to generate access URL",
+      code: "SERVER_ERROR",
+    });
+  }
+});
+
 // endpoint to stream superchat events
 app.get("/superchat-events", (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");

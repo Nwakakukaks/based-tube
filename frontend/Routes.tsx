@@ -9,6 +9,8 @@ import { StreamPage } from "./pages/streams/page";
 import { AccessPage } from "./pages/access/page";
 import { RedirectToClaimPage } from "./pages/redirectClaim/page";
 import { ClaimPage } from "./pages/claim/page";
+import CreatorLinkGenerator from "./components/main/createLink";
+import RedirectToAccess from "./components/main/redirectAccess";
 
 const AppRoutes = () => {
   return (
@@ -22,8 +24,10 @@ const AppRoutes = () => {
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/claim" element={<ClaimPage />} />
           <Route path="/access" element={<AccessPage />} />
-          <Route path="/s/:shortCode" element={<RedirectToPaymentPage />} />
           <Route path="/c/:shortCode" element={<RedirectToClaimPage />} />
+          <Route path="/s/:shortCode" element={<RedirectToPaymentPage />} />
+          <Route path="/a/:shortCode" element={<RedirectToAccess />} />
+          <Route path="/create-link" element={<CreatorLinkGenerator />} />
         </Routes>
       </Layout>
     </Router>
