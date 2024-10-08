@@ -46,7 +46,7 @@ const RedirectToClaim: React.FC = () => {
     <div className="flex flex-col items-center justify-center h-screen">
       {error ? (
         <div 
-          className="text-blue-500 mb-4 cursor-pointer hover:underline" 
+          className="text-red-500 mb-4 cursor-pointer hover:underline" 
           onClick={() => {
             const pathParts = window.location.pathname.split("/");
             const shortCode = pathParts[pathParts.length - 1];

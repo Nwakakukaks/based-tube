@@ -202,7 +202,7 @@ const DisburseRewards = ({ videoId, transactions }: { videoId: string; transacti
                     <span className="flex items-center">
                       {status[address] === "pending" && <Loader2 className="animate-spin h-4 w-4" />}
                       {status[address] === "success" && <CheckCircle2 className="h-4 w-4 text-green-500" />}
-                      {status[address] === "error" && <p className=" text-blue-500 text-sm font-semibold">Failed </p>}
+                      {status[address] === "error" && <p className=" text-red-500 text-sm font-semibold">Failed </p>}
                     </span>
                   )}
                 </div>

@@ -20,7 +20,7 @@ export function WalletDetails() {
           {
             label: "URL",
             value: wallet?.url ? (
-              <a href={wallet.url} target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-300">
+              <a href={wallet.url} target="_blank" rel="noreferrer" className="text-red-600 dark:text-red-300">
                 {wallet.url}
               </a>
             ) : (

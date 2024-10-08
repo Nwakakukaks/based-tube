@@ -14,7 +14,7 @@ const Creator: React.FC = () => {
 
   const renderInputForm = () => (
     <div className="form-container bg-gray-200 rounded-lg p-6 shadow-lg">
-      <h1 className="text-2xl text-blue-600">Create your Creator link</h1>
+      <h1 className="text-2xl text-red-600">Create your Creator link</h1>
       <p>Generate a unique URL and pin it in your live chat</p>
       <input
         type="text"
@@ -31,7 +31,7 @@ const Creator: React.FC = () => {
         className="mt-4 p-2 border rounded text-gray-900"
       />
       <button
-        className="submit-button mt-4 bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+        className="submit-button mt-4 bg-red-600 text-white p-2 rounded hover:bg-red-700"
         onClick={generateSuperchatUrl}
       >
         Generate Creator Link
@@ -40,7 +40,7 @@ const Creator: React.FC = () => {
         <div className="generated-url mt-4 p-4 bg-white rounded shadow text-gray-900">
           <p>
             Your generated URL:{" "}
-            <a href={generatedUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+            <a href={generatedUrl} target="_blank" rel="noopener noreferrer" className="text-red-500 underline">
               {generatedUrl}
             </a>
           </p>
@@ -53,7 +53,7 @@ const Creator: React.FC = () => {
     <div className="text-center">
       <h2 className="text-2xl mb-4">Welcome to the Setup</h2>
       <button
-        className="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+        className="mt-4 bg-red-500 text-white p-2 rounded hover:bg-red-600"
         onClick={() => setCurrentStep(1)} // Move to Dynamic Mint step
       >
         Begin Setup
@@ -140,7 +140,7 @@ const Creator: React.FC = () => {
         <div className="flex justify-between mt-4">
           {currentStep < steps.length - 1 && (
             <button
-              className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+              className="bg-red-500 text-white p-2 rounded hover:bg-red-600"
               onClick={() => setCurrentStep(currentStep + 1)}
             >
               Next Step

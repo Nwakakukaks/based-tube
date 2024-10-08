@@ -11,18 +11,18 @@ export const HeroSection = () => {
   return (
     <div className="flex flex-col gap-8 items-center mt-12">
       <p className="md:text-5xl text-3xl text-center max-w-4xl font-semibold">
-        Receive youtube superchats in <span className="text-blue-500">Aptos</span> Tokens
+        Receive youtube superchats in <span className="text-red-500">Aptos</span> Tokens
       </p>
       <p className="text-gray-400 text-sm font-medium max-w-2xl mx-auto text-center">
         Create shareable links to recieve SUPERCHATS in Aptos tokens from your viewers during live streams. Coming soon
         on X, Tiktok and Instagram!
       </p>
 
-      <div className="flex items-center">
+      <div className="flex items-center space-x-3">
         <Button
           onClick={handleGetStarted}
           size={"lg"}
-          className="bg-blue-600 rounded-full hover:bg-blue-300 text-white"
+          className="bg-red-600 rounded-full hover:bg-red-300 text-white"
         >
           Get Started Now
         </Button>

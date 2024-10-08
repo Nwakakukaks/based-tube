@@ -348,10 +348,10 @@ const DynamicMint = () => {
               disabled={loading}
               className={`w-full ${
                 loading
-                  ? "bg-gradient-to-r from-blue-600 to-white animate-pulse"
+                  ? "bg-gradient-to-r from-red-600 to-white animate-pulse"
                   : success
-                    ? "bg-blue-600"
-                    : "bg-blue-600 hover:bg-blue-400"
+                    ? "bg-red-600"
+                    : "bg-red-600 hover:bg-red-400"
               } text-white font-bold py-2 px-4 rounded`}
             >
               {loading ? "Processing..." : success ? "✓ Done!" : "Create Token"}
@@ -432,7 +432,7 @@ const DynamicMint = () => {
             {/* <div className="flex justify-between items-center text-gray-900">
               <span>Token Address:</span>
               <a
-                className="text-blue-500 hover:underline truncate max-w-[200px]"
+                className="text-red-500 hover:underline truncate max-w-[200px]"
                 target="_blank"
                 href={`https://explorer.aptoslabs.com/account/${asset?.asset_type}?network=testnet`}
                 rel="noopener noreferrer"
