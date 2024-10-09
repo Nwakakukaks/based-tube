@@ -12,9 +12,11 @@ const Payment: React.FC = () => {
   const queryClient = useQueryClient();
   const [message, setMessage] = useState("");
   const [amount, setAmount] = useState("");
+  const [generatedUrl, setGeneratedUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [videoId, setVideoId] = useState(new URLSearchParams(window.location.search).get("vid") || "");
+  const [address, setAddress] = useState(new URLSearchParams(window.location.search).get("lnaddr") || "");
 
   const sendSuperchat = async () => {
     if (message && amount) {
@@ -54,13 +56,12 @@ const Payment: React.FC = () => {
 
     if (isNaN(transferAmount) || transferAmount <= 0) {
       toast({
-        title: 'Wrong number format',
-        description: 'Please enter a valid number'
-      })
+        title: "Wrong number format",
+        description: "Please enter a valid number",
+      });
       setLoading(false);
       return;
     }
-
 
     try {
       const committedTransaction = await signAndSubmitTransaction(
@@ -113,8 +114,47 @@ const Payment: React.FC = () => {
     }
   };
 
-  const showSuccessMessage = () => {
+  const showSuccessMessage = async () => {
+    await generateClaimUrl();
     setSuccessMessage(`Your Superchat has been posted to YouTube.\nMessage: ${message}\nAmount: ${amount} APTO`);
+  };
+
+  const generateClaimUrl = async () => {
+    if (videoId && address) {
+      try {
+        const response = await fetch("/api/generate-short-url", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ videoId, address: address }),
+        });
+        const data = await response.json();
+
+        if (data.error) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: data.error,
+          });
+        } else {
+          const claimUrl = `${window.location.origin}/c/${data.shortCode}`;
+          setGeneratedUrl(claimUrl);
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: `An error occurred: ${error}`,
+        });
+      }
+    } else {
+      toast({
+        variant: "default",
+        title: "Claim Link Error",
+        description: "Failed to generate Claim Link",
+      });
+    }
   };
 
   return (
@@ -140,20 +180,24 @@ const Payment: React.FC = () => {
         />
         <Button
           id="send-superchat-button"
-          onClick={sendSuperchat} 
+          onClick={sendSuperchat}
           disabled={loading}
           className={`w-full bg-gradient-to-br from-red-600 to-red-800 text-white rounded p-2 transition-all duration-300 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
         >
           {loading ? "Sending..." : "Send Superchat"}
         </Button>
-        {loading && <div className="loader"></div>}
       </div>
 
       {successMessage && (
-        <div className="bg-green-600 rounded-lg p-4 mt-4">
-          <h2 className="text-xl font-bold">Payment Successful!</h2>
-          <p>{successMessage}</p>
-          <p>Congrats you can claim your membership token and NFT here: <a>http://localhost:5173/claim</a></p>
+        <div className="bg-white text-gray-900 rounded-md p-2 mt-4">
+          <h2 className="text-lg font-bold">Payment Successful!</h2>
+          <p className="text-sm">{successMessage}</p>
+          <p className="text-sm">
+            Claim your reward token here: <a className="text-red-500">{generatedUrl}</a>
+          </p>
+          <p className="text-sm">
+            Claim your reward token here: <a className="text-red-500">{generatedUrl}</a>
+          </p>
         </div>
       )}
     </div>

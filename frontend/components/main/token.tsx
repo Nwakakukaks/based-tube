@@ -20,6 +20,8 @@ import { toast } from "../ui/use-toast";
 
 const DynamicMint = () => {
   const location = useLocation();
+  const [videoId, setVideoId] = useState(new URLSearchParams(window.location.search).get("vid") || "");
+  const [address, setAddress] = useState(new URLSearchParams(window.location.search).get("lnaddr") || "");
 
   const fas = useGetAssetMetadata();
 
@@ -60,7 +62,7 @@ const DynamicMint = () => {
   const [error, setError] = useState<string | null>(null);
   const [image, setImage] = useState<File | undefined>();
   const { data } = useGetAssetData(FA_ADDRESS);
-
+  const [generatedUrl, setGeneratedUrl] = useState("");
   const [isUploading, setIsUploading] = useState(false);
 
   const { asset, userMintBalance = 0, yourBalance = 0, maxSupply = 0, currentSupply = 0 } = data ?? {};
@@ -188,11 +190,50 @@ const DynamicMint = () => {
     queryClient.invalidateQueries();
 
     if (claim.success) {
+      await generateAccessUrl()
       toast({
         title: "Success",
         description: `Token claimed successfully, hash: ${claim.hash}`,
       });
       setSuccess(true);
+    }
+  };
+
+  const generateAccessUrl = async () => {
+    if (videoId && address) {
+      try {
+        const response = await fetch("/api/generate-short-url", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ videoId, address: address }),
+        });
+        const data = await response.json();
+
+        if (data.error) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: data.error,
+          });
+        } else {
+          const accessUrl = `${window.location.origin}/a/${data.shortCode}`;
+          setGeneratedUrl(accessUrl);
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: `An error occurred: ${error}`,
+        });
+      }
+    } else {
+      toast({
+        variant: "default",
+        title: "Access Link Error",
+        description: "Failed to generate Access Link",
+      });
     }
   };
 
@@ -210,7 +251,6 @@ const DynamicMint = () => {
             />
 
             <div className="mt-1">
-            
               <div className="flex items-center space-x-2 my-1">
                 <Button
                   onClick={() => fileInputRef.current?.click()}
@@ -236,7 +276,9 @@ const DynamicMint = () => {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4 text-start">
               <div>
-                <Label className="text-gray-100" htmlFor="name">Token Name</Label>
+                <Label className="text-gray-100" htmlFor="name">
+                  Token Name
+                </Label>
                 <Input
                   id="name"
                   name="name"
@@ -247,7 +289,9 @@ const DynamicMint = () => {
                 />
               </div>
               <div>
-                <Label className="text-gray-100" htmlFor="symbol">Token Symbol</Label>
+                <Label className="text-gray-100" htmlFor="symbol">
+                  Token Symbol
+                </Label>
                 <Input
                   id="symbol"
                   name="symbol"
@@ -260,7 +304,9 @@ const DynamicMint = () => {
             </div>
 
             <div className="mt-4 text-start">
-              <Label className="text-gray-100" htmlFor="decimals">Decimals</Label>
+              <Label className="text-gray-100" htmlFor="decimals">
+                Decimals
+              </Label>
               <Input
                 id="decimals"
                 name="decimals"
@@ -273,7 +319,12 @@ const DynamicMint = () => {
             </div>
 
             <div className="flex items-center space-x-2 my-6">
-              <Checkbox className=" bg-white" id="advanced" checked={showAdvanced} onCheckedChange={() => setShowAdvanced(!showAdvanced)} />
+              <Checkbox
+                className=" bg-white"
+                id="advanced"
+                checked={showAdvanced}
+                onCheckedChange={() => setShowAdvanced(!showAdvanced)}
+              />
               <Label className="text-gray-100" htmlFor="advanced">
                 Show advanced options
               </Label>
@@ -317,7 +368,9 @@ const DynamicMint = () => {
                 </div> */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 text-start">
                   <div>
-                    <Label className="text-gray-100" htmlFor="mint_limit_per_addr">Mint Limit per Address</Label>
+                    <Label className="text-gray-100" htmlFor="mint_limit_per_addr">
+                      Mint Limit per Address
+                    </Label>
                     <Input
                       id="mint_limit_per_addr"
                       name="mint_limit_per_addr"
@@ -329,7 +382,9 @@ const DynamicMint = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-gray-100" htmlFor="max_supply">Max Supply</Label>
+                    <Label className="text-gray-100" htmlFor="max_supply">
+                      Max Supply
+                    </Label>
                     <Input
                       id="max_supply"
                       name="max_supply"
@@ -347,11 +402,7 @@ const DynamicMint = () => {
               onClick={onCreateAsset}
               disabled={loading}
               className={`w-full text-lg mt-4 ${
-                loading
-                  ? "bg-gradient-to-r from-red-500 to-white animate-pulse"
-                  : success
-                    ? ""
-                    : ""
+                loading ? "bg-gradient-to-r from-red-500 to-white animate-pulse" : success ? "" : ""
               } text-black bg-slate-50 hover:bg-slate-50 font-bold py-2 px-4 rounded`}
             >
               {loading ? "Processing..." : success ? "✓ Done!" : "Create Token"}
@@ -372,7 +423,7 @@ const DynamicMint = () => {
 
           <div className="flex flex-col gap-6">
             <div>
-              <Label className="text-gray-100 font-medium text-lg" htmlFor="quantity"  >
+              <Label className="text-gray-100 font-medium text-lg" htmlFor="quantity">
                 Quantity to Mint
               </Label>
               <Input
@@ -441,6 +492,14 @@ const DynamicMint = () => {
               </a>
             </div> */}
           </div>
+
+          {success && (
+            <div className="bg-white text-gray-900 rounded-md p-2 mt-4">
+              <p className="text-sm">
+                Horray! Unlock creators exclusive contents here: <a className="text-red-500">{generatedUrl}</a>
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>
