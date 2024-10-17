@@ -10,7 +10,7 @@ const Creator: React.FC = () => {
 
   const BeginSetup = () => (
     <div className="text-center p-10">
-      <h2 className="text-2xl font-semibold mb-4">Welcome to Aptopus</h2>
+      <h2 className="text-2xl font-semibold mb-4">Welcome to SuperBase</h2>
       <p className="text-gray-300 text-sm">Get started in just two quick steps</p>
 
       <div className="grid grid-cols-2 gap-5 mx-48 mt-8">

@@ -51,7 +51,7 @@ const RedirectToPayment: React.FC = () => {
     console.log(url)
     if (!url) return;
 
-    const popup = window.open(url, 'Aptopus', "width=450,height=600,left=100,top=100,resizable=yes,scrollbars=yes,status=yes");
+    const popup = window.open(url, 'SuperBase', "width=450,height=600,left=100,top=100,resizable=yes,scrollbars=yes,status=yes");
 
     if (!popup || popup.closed || typeof popup.closed === "undefined") {
       setError("Popup blocked - clicking 'Open' will redirect in the current tab");

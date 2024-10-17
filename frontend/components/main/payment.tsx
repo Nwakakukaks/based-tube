@@ -160,7 +160,7 @@ const Payment: React.FC = () => {
   return (
     <div className="flex justify-center items-center mx-auto h-[75vh]">
       <div className={`bg-white rounded-lg shadow-md px-6 py-12 w-[85%]`}>
-        <h1 className="text-2xl text-blue-600">Aptopus 🐙</h1>
+        <h1 className="text-2xl text-blue-600">SuperBase 🐙</h1>
         <Input
           name="message"
           placeholder="Enter your Superchat message"

@@ -24,7 +24,7 @@ export function Header() {
 
       <div className="flex items-center justify-between px-4 py-2 max-w-screen-xl mx-auto w-full flex-wrap lg:px-20 mt-1">
         <h3 onClick={handleHome} className="text-xl font-bold cursor-pointer">
-          Aptopus
+          SuperBase
         </h3>
 
         {location.pathname === "/" && (
