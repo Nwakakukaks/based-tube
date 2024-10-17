@@ -160,7 +160,7 @@ const Payment: React.FC = () => {
   return (
     <div className="flex justify-center items-center mx-auto h-[75vh]">
       <div className={`bg-white rounded-lg shadow-md px-6 py-12 w-[85%]`}>
-        <h1 className="text-2xl text-red-600">Aptopus 🐙</h1>
+        <h1 className="text-2xl text-blue-600">Aptopus 🐙</h1>
         <Input
           name="message"
           placeholder="Enter your Superchat message"
@@ -182,7 +182,7 @@ const Payment: React.FC = () => {
           id="send-superchat-button"
           onClick={sendSuperchat}
           disabled={loading}
-          className={`w-full bg-gradient-to-br from-red-600 to-red-800 text-white rounded p-2 transition-all duration-300 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
+          className={`w-full bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded p-2 transition-all duration-300 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
         >
           {loading ? "Sending..." : "Send Superchat"}
         </Button>
@@ -193,10 +193,10 @@ const Payment: React.FC = () => {
           <h2 className="text-lg font-bold">Payment Successful!</h2>
           <p className="text-sm">{successMessage}</p>
           <p className="text-sm">
-            Claim your reward token here: <a className="text-red-500">{generatedUrl}</a>
+            Claim your reward token here: <a className="text-blue-500">{generatedUrl}</a>
           </p>
           <p className="text-sm">
-            Claim your reward token here: <a className="text-red-500">{generatedUrl}</a>
+            Claim your reward token here: <a className="text-blue-500">{generatedUrl}</a>
           </p>
         </div>
       )}

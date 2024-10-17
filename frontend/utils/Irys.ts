@@ -6,7 +6,7 @@ import { getAccountAPTBalance } from "@/view-functions/getAccountAPTBalance";
 const getWebIrys = async (aptosWallet: any) => {
   const network = "devnet"; // Irys network
   const token = "aptos";
-  const rpcUrl = "testnet"; // Aptos network "mainnet" || "testnet"
+  const rpcUrl = "testnet"; // Base network "mainnet" || "testnet"
   const wallet = { rpcUrl: rpcUrl, name: "aptos", provider: aptosWallet };
   const webIrys = new WebIrys({ network, token, wallet });
   await webIrys.ready();

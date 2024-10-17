@@ -24,7 +24,7 @@ export function NetworkInfo() {
           {
             label: "URL",
             value: network?.url ? (
-              <a href={network.url} target="_blank" rel="noreferrer" className="text-red-600 dark:text-red-300">
+              <a href={network.url} target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-300">
                 {network.url}
               </a>
             ) : (

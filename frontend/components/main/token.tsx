@@ -402,7 +402,7 @@ const DynamicMint = () => {
               onClick={onCreateAsset}
               disabled={loading}
               className={`w-full text-lg mt-4 ${
-                loading ? "bg-gradient-to-r from-red-500 to-white animate-pulse" : success ? "" : ""
+                loading ? "bg-gradient-to-r from-blue-500 to-white animate-pulse" : success ? "" : ""
               } text-black bg-slate-50 hover:bg-slate-50 font-bold py-2 px-4 rounded`}
             >
               {loading ? "Processing..." : success ? "✓ Done!" : "Create Token"}
@@ -474,7 +474,7 @@ const DynamicMint = () => {
               onClick={mintFA}
               disabled={loading}
               className={`w-full ${
-                loading ? "bg-gradient-to-r from-red-500 to-white animate-pulse" : success ? "" : ""
+                loading ? "bg-gradient-to-r from-blue-500 to-white animate-pulse" : success ? "" : ""
               } text-black text-lg font-bold py-1 px-4 rounded border border-black `}
             >
               {loading ? "Claiming..." : success ? "✓ Claimed Successfully!" : "Claim Token"}
@@ -483,7 +483,7 @@ const DynamicMint = () => {
             {/* <div className="flex justify-between items-center text-gray-200">
               <span>Token Address:</span>
               <a
-                className="text-red-500 hover:underline truncate max-w-[200px]"
+                className="text-blue-500 hover:underline truncate max-w-[200px]"
                 target="_blank"
                 href={`https://explorer.aptoslabs.com/account/${asset?.asset_type}?network=testnet`}
                 rel="noopener noreferrer"
@@ -496,7 +496,7 @@ const DynamicMint = () => {
           {success && (
             <div className="bg-white text-gray-900 rounded-md p-2 mt-4">
               <p className="text-sm">
-                Horray! Unlock creators exclusive contents here: <a className="text-red-500">{generatedUrl}</a>
+                Horray! Unlock creators exclusive contents here: <a className="text-blue-500">{generatedUrl}</a>
               </p>
             </div>
           )}

@@ -21,7 +21,7 @@ export async function getGroqChatCompletion(text: string): Promise<any> {
       {
         role: "system",
         content: `
-        You are an assistant focused on answering questions about the Aptos blockchain. Provide clear and direct answers based on user queries.
+        You are an assistant focused on answering questions about the Base blockchain. Provide clear and direct answers based on user queries.
         `,
       },
       {

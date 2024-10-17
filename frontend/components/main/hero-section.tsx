@@ -55,19 +55,19 @@ export const HeroSection: React.FC = () => {
   return (
     <div className="flex flex-col gap-6 items-center mt-12">
       <p className="md:text-5xl text-3xl text-center max-w-4xl font-semibold">
-        Receive YouTube superchats in <span className="text-red-500">Aptos</span> Tokens
+        Receive YouTube superchats in <span className="text-blue-500">Base</span> Tokens
       </p>
 
       {/* <p className="md:text-5xl text-3xl text-center max-w-4xl font-semibold">
-        Support your favorite creators with <span className="text-red-500">Aptos</span> Tokens
+        Support your favorite creators with <span className="text-blue-500">Base</span> Tokens
       </p> */}
       <p className="text-gray-400 text-sm font-medium max-w-2xl mx-auto text-center">
-        Create shareable links to receive SUPERCHATS in Aptos tokens from your viewers during live streams. Coming soon
+        Create shareable links to receive SUPERCHATS in Base tokens from your viewers during live streams. Coming soon
         on Twitch, TikTok, and Instagram!
       </p>
 
       <div className="flex items-center space-x-3">
-        <Button onClick={handleGetStarted} size={"lg"} className="bg-red-600 rounded-full hover:bg-red-300 text-white">
+        <Button onClick={handleGetStarted} size={"lg"} className="bg-blue-600 rounded-full hover:bg-blue-300 text-white">
           Get Started Now
         </Button>
 

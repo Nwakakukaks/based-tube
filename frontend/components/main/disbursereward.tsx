@@ -149,7 +149,7 @@ const DisburseRewards = ({ videoId, transactions }: { videoId: string; transacti
 
   return (
     <div className="bg-white rounded-none w-full shadow-md mx-auto border-2 border-black font-vt323">
-      <div className="h-6 bg-red-500 w-full flex justify-between px-2">
+      <div className="h-6 bg-blue-500 w-full flex justify-between px-2">
         <p className="text-base font-semibold text-black">{videoId}</p>
         {/* <img src="https://utfs.io/f/PKy8oE1GN2J3JMeRo2HVozIYU8DFRWmkp7SC4bh16KiGHZfv" alt="Logo" /> */}
       </div>
@@ -202,7 +202,7 @@ const DisburseRewards = ({ videoId, transactions }: { videoId: string; transacti
                     <span className="flex items-center">
                       {status[address] === "pending" && <Loader2 className="animate-spin h-4 w-4" />}
                       {status[address] === "success" && <CheckCircle2 className="h-4 w-4 text-green-500" />}
-                      {status[address] === "error" && <p className=" text-red-500 text-sm font-semibold">Failed </p>}
+                      {status[address] === "error" && <p className=" text-blue-500 text-sm font-semibold">Failed </p>}
                     </span>
                   )}
                 </div>

@@ -47,7 +47,7 @@ const Creator: React.FC = () => {
             <CardContent>
               <p className="text-white mb-3 text-lg font-medium">Start Your Live Stream Session</p>
               <p className="text-gray-400 text-sm">
-                Begin a live stream and paste your live stream URL and Aptos wallet address, then generate a link to
+                Begin a live stream and paste your live stream URL and Base wallet address, then generate a link to
                 share in your chat.
               </p>
             </CardContent>
@@ -79,7 +79,7 @@ const Creator: React.FC = () => {
         <div className="flex justify-center mt-2">
           <Button
             size={"lg"}
-            className="bg-red-500 text-white py-2 px-20 hover:bg-red-400 rounded-full"
+            className="bg-blue-500 text-white py-2 px-20 hover:bg-blue-400 rounded-full"
             onClick={handleProceed}
           >
             {currentStep < steps.length - 1 ? "Proceed" : "Start Live Stream"}

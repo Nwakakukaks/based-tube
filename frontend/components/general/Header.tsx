@@ -16,7 +16,7 @@ export function Header() {
 
   return (
     <>
-      <div className="w-full bg-red-50 p-1">
+      <div className="w-full bg-blue-50 p-1">
         <p className="text-xs text-center text-black">
           We appreciate you exploring our beta! Your feedback helps us grow and improve.
         </p>
@@ -37,7 +37,7 @@ export function Header() {
 
         <div className=" flex items-center space-x-4">
           {location.pathname === "/" ? (
-            <Button onClick={handleLogin} className="bg-red-600 rounded-full py-3 px-8 hover:bg-red-300">
+            <Button onClick={handleLogin} className="bg-blue-600 rounded-full py-3 px-8 hover:bg-blue-300">
               Login
             </Button>
           ) : (

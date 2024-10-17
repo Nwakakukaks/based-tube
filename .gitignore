@@ -1,4 +1,4 @@
-# Aptos related files
+# Base related files
 .aptos
 .env
 contract/build

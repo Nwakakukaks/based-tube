@@ -31,7 +31,7 @@ app.post("/send-message", async (req, res) => {
   console.log("Received message:", message);
   console.log("Amount:", amount);
   console.log("Video ID:", videoId);
-  console.log("Aptos Address:", address);
+  console.log("Base Address:", address);
 
   try {
     // Get live chat ID

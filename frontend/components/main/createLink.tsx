@@ -97,7 +97,7 @@ const CreatorLinkGenerator: React.FC = () => {
   return (
     <div className="flex justify-center items-center mt-10 h-[70vh]">
       <div className="border-2 border-gray-500 flex flex-col justify-center items-center gap-2 rounded-sm px-4 py-12 shadow-lg w-[90%]">
-        <h1 className="text-2xl text-red-600">Generate Your Unique Link</h1>
+        <h1 className="text-2xl text-blue-600">Generate Your Unique Link</h1>
         <p>Generate a unique URL and pin it in your live chat</p>
 
         <div className="flex space-x-4 w-[90%]">
@@ -110,7 +110,7 @@ const CreatorLinkGenerator: React.FC = () => {
           />
           <Input
             type="text"
-            placeholder="Enter your Aptos address"
+            placeholder="Enter your Base address"
             value={aptosAddress}
             onChange={(e) => setAptosAddress(e.target.value)}
             className="mt-4 p-2 border rounded-sm text-gray-800"
@@ -118,7 +118,7 @@ const CreatorLinkGenerator: React.FC = () => {
         </div>
 
         <Button
-          className="submit-button mt-4 bg-red-600 text-white p-2 rounded hover:bg-red-700 w-[90%]"
+          className="submit-button mt-4 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 w-[90%]"
           onClick={generateSuperchatUrl}
         >
           Generate Creator Link
@@ -127,7 +127,7 @@ const CreatorLinkGenerator: React.FC = () => {
           <div className="flex space-x-3 items-center justify-center mt-4 p-4 bg-white rounded-sm shadow text-gray-900 w-[90%]">
             <p className="text-sm text-center">
               Your generated URL:{" "}
-              <a href={generatedUrl} target="_blank" rel="noopener noreferrer" className="text-red-500 underline">
+              <a href={generatedUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
                 {generatedUrl}
               </a>
             </p>
