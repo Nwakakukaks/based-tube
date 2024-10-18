@@ -15,3 +15,5 @@ export const mintABI = [
     type: 'function',
   },
 ] as const;
+
+export const Contract_Address = "0xC8d79e2796614F50cF1c2810671010c3493AEA8B";
