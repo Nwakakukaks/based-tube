@@ -1,14 +1,10 @@
 import React, { useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { transferAPT } from "@/entry-functions/transferAPT";
-import { aptosClient } from "@/utils/aptosClient";
 import { toast } from "../ui/use-toast";
-import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { useQueryClient } from "@tanstack/react-query";
 
 const Payment: React.FC = () => {
-  const { connected, signAndSubmitTransaction } = useWallet();
   const queryClient = useQueryClient();
   const [message, setMessage] = useState("");
   const [amount, setAmount] = useState("");
@@ -64,26 +60,7 @@ const Payment: React.FC = () => {
     }
 
     try {
-      const committedTransaction = await signAndSubmitTransaction(
-        transferAPT({
-          to: address!,
-          amount: transferAmount,
-        }),
-      );
-
-      const executedTransaction = await aptosClient().waitForTransaction({
-        transactionHash: committedTransaction.hash,
-      });
-
-      if (executedTransaction && executedTransaction.hash) {
-        queryClient.invalidateQueries();
-
-        toast({
-          title: "Success",
-          description: `Transaction succeeded, hash: ${executedTransaction.hash}`,
-        });
-
-        const hash = executedTransaction.hash;
+      if (videoId) {
         // Simulate the payment
         const response = await fetch("/api/simulate-payment", {
           method: "POST",
@@ -93,7 +70,6 @@ const Payment: React.FC = () => {
             amount,
             videoId,
             address,
-            hash,
           }),
         });
 

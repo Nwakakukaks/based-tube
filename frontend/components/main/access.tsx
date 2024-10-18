@@ -1,11 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useGetAssetData } from "@/hooks/useGetAssetData";
-import { useGetAssetMetadata } from "@/hooks/useGetAssetMetadata";
-import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import React, { useEffect, useState } from "react";
 import { toast } from "@/components/ui/use-toast";
-import { getTokenBalance } from "@/view-functions/getTokenBalance";
 import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Lock, Unlock } from "lucide-react";
 
@@ -40,36 +35,9 @@ const PlatformButton: React.FC<PlatformButtonProps> = ({ platform, onClick, isLo
   </Button>
 );
 
-interface AssetMetadata {
-  asset_type: string;
-}
-
-interface AssetData {
-  asset: {
-    asset_type: string;
-  };
-}
-
-interface BalanceData {
-  balance: number;
-}
-
 const Access: React.FC = () => {
-  const fas = useGetAssetMetadata();
-  const { account, signMessageAndVerify } = useWallet();
   const [loadingStates, setLoadingStates] = useState<Record<string, string | null>>({});
   const [signedPlatform, setSignedPlatform] = useState<Platform | null>(null);
-
-  const lastAssetType = useMemo(() => {
-    if (fas.length > 0) {
-      return fas[fas.length - 1].asset_type;
-    }
-    return "";
-  }, [fas]);
-
-  const FA_ADDRESS = lastAssetType;
-  const { data: assetData } = useGetAssetData(FA_ADDRESS);
-  const { asset } = (assetData as AssetData) ?? {};
 
   const platforms: Platform[] = [
     { name: "Patreon", requiredBalance: 1 },
@@ -89,38 +57,10 @@ const Access: React.FC = () => {
     return `${prefix}-${randomString}`;
   };
 
-  const { data: balanceData, refetch: fetchBalance } = useQuery<BalanceData>({
-    queryKey: ["token-balance", account?.address],
-    queryFn: async () => {
-      try {
-        if (!account?.address || !asset?.asset_type) {
-          console.log("Account or asset not available");
-          return { balance: 0 };
-        }
-
-        const balance = await getTokenBalance({
-          accountAddress: account.address,
-          fa_obj: asset.asset_type,
-        });
-
-        return { balance };
-      } catch (error) {
-        console.error("Balance fetch error:", error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Error fetching balance",
-        });
-        return { balance: 0 };
-      }
-    },
-    enabled: false,
-  });
-
   useEffect(() => {
     const checkBalanceAndGrant = async () => {
-      if (signedPlatform && balanceData) {
-        const tokenBalance = balanceData.balance / Math.pow(10, 8);
+      if (signedPlatform) {
+        const tokenBalance = 2 / Math.pow(10, 8);
 
         if (tokenBalance >= signedPlatform.requiredBalance) {
           const passkey = generateRandomString(signedPlatform.name);
@@ -142,7 +82,7 @@ const Access: React.FC = () => {
     };
 
     checkBalanceAndGrant();
-  }, [balanceData, signedPlatform]);
+  }, [signedPlatform]);
 
   const handleAccess = async (platform: Platform) => {
     const message = "Search wallet holdings for creator token";
@@ -150,12 +90,11 @@ const Access: React.FC = () => {
     setLoadingStates((prev) => ({ ...prev, [platform.name]: "accessing" }));
 
     try {
-      const data = await signMessageAndVerify({ message, nonce: "" });
+      const data = 1
 
       if (data) {
         setLoadingStates((prev) => ({ ...prev, [platform.name]: "checking" }));
         setSignedPlatform(platform);
-        await fetchBalance();
       }
     } catch (error) {
       toast({

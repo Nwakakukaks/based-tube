@@ -96,3 +96,39 @@
 .animate-scroll {
   animation: scroll 10s linear infinite;
 }
+
+svg {
+  display: block;
+  overflow: visible;
+  vertical-align: middle;
+}
+
+ul {
+  padding-inline-start: 0;
+}
+
+/* stylelint-disable-next-line */
+#__next {
+  position: relative;
+  z-index: 0;
+}
+
+.ockConnectWallet_Container span {
+  color: #030712;
+}
+
+/* i believe this is necessary because 
+of a div added by rainbowkit provider */
+body > div {
+  height: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+}
+
+.templateSection > div {
+  max-width: 100%;;
+}

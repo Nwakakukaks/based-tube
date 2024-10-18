@@ -1,14 +1,6 @@
 import { useState } from "react";
-import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Loader2, CheckCircle2 } from "lucide-react";
-import { aptosClient } from "@/utils/aptosClient";
-// import { mintNFT } from "@/entry-functions/mint_nft";
-import { mintAsset } from "@/entry-functions/mint_asset";
-import { toast } from "@/components/ui/use-toast";
-import { useGetCollections } from "@/hooks/useGetCollections";
-import { GetCollectionDataResponse } from "@aptos-labs/ts-sdk";
-import { useGetCollectionData } from "@/hooks/useGetCollectionData";
 
 interface Transaction {
   amount: string;
@@ -20,132 +12,9 @@ interface Transaction {
 }
 
 const DisburseRewards = ({ videoId, transactions }: { videoId: string; transactions: Transaction[] }) => {
-  const collections: Array<GetCollectionDataResponse> = useGetCollections();
-
-  function getLastCollection(collections: Array<GetCollectionDataResponse>): GetCollectionDataResponse | null {
-    if (collections.length === 0) {
-      return null;
-    }
-    return collections[collections.length - 2];
-  }
-
-  const isCollectionCreated = getLastCollection(collections);
-  const { data } = useGetCollectionData(isCollectionCreated?.collection_id);
-  const { collection } = data ?? {};
-
-  const { account, signAndSubmitTransaction } = useWallet();
-  const [loadingToken, setLoadingToken] = useState(false);
-  const [loadingNFT, setLoadingNFT] = useState(false);
   const [status, setStatus] = useState<{ [key: string]: "pending" | "success" | "error" }>({});
   const uniqueAddresses = Array.from(new Set(transactions.map((t) => t.address)));
   const totalContributions = transactions.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
-
-  const handleDisburseNFTs = async () => {
-    if (!account || !collection) {
-      toast({
-        title: "Error",
-        description: "Please connect wallet and ensure you have an NFT collection",
-      });
-      return;
-    }
-  
-    setLoadingNFT(true);
-    let allSuccess = true; // Track overall success
-    try {
-      for (const address of uniqueAddresses) {
-        setStatus((prev) => ({ ...prev, [address]: "pending" }));
-        try {
-        //   const response = await signAndSubmitTransaction(
-        //     mintNFT({
-        //       collectionId: collection.collection_id,
-        //       amount: 1,
-        //       address: address,
-        //     }),
-        //   );
-        //   await aptosClient().waitForTransaction({ transactionHash: response.hash });
-          setStatus((prev) => ({ ...prev, [address]: "success" }));
-        } catch (error) {
-          allSuccess = false; // Mark as not all succeeded
-          setStatus((prev) => ({ ...prev, [address]: "error" }));
-          console.error(`Error minting NFT for ${address}:`, error);
-        }
-      }
-  
-      if (allSuccess) {
-        toast({
-          title: "Success",
-          description: "All NFTs have been successfully disbursed.",
-        });
-      } else {
-        toast({
-          title: "Partial Success",
-          description: "Some NFTs could not be disbursed.",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to disburse NFTs",
-      });
-    } finally {
-      setLoadingNFT(false);
-    }
-  };
-
-  const handleDisburseTokens = async () => {
-    if (!account) {
-      toast({
-        title: "Error",
-        description: "Please connect wallet",
-      });
-      return;
-    }
-  
-    setLoadingToken(true);
-    let allSuccess = true; // Track overall success
-    try {
-      for (const address of uniqueAddresses) {
-        setStatus((prev) => ({ ...prev, [address]: "pending" }));
-        try {
-          const response = await signAndSubmitTransaction(
-            mintAsset({
-              assetType: "0x996ef140a51d2301075bca23c32e9432e4b23909d3b090ae2247c8b6ef70d9a8",
-              amount: 1,
-              address: address,
-              decimals: 8,
-            }),
-          );
-          await aptosClient().waitForTransaction({ transactionHash: response.hash });
-          setStatus((prev) => ({ ...prev, [address]: "success" }));
-        } catch (error) {
-          allSuccess = false; // Mark as not all succeeded
-          setStatus((prev) => ({ ...prev, [address]: "error" }));
-          console.error(`Error minting token for ${address}:`, error);
-        }
-      }
-  
-      if (allSuccess) {
-        toast({
-          title: "Success",
-          description: "All tokens have been successfully disbursed.",
-        });
-      } else {
-        toast({
-          title: "Partial Success",
-          description: "Some tokens could not be disbursed.",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to disburse tokens",
-      });
-    } finally {
-      setLoadingToken(false);
-    }
-  };
-  
-  
 
   return (
     <div className="bg-white rounded-none w-full shadow-md mx-auto border-2 border-black font-vt323">
@@ -170,28 +39,6 @@ const DisburseRewards = ({ videoId, transactions }: { videoId: string; transacti
                 <p className="text-2xl font-bold">{totalContributions.toFixed(3)} ETH</p>
               </div>
             </div>
-
-            {/* <div className="space-y-4">
-              <div className="flex gap-2">
-                <button
-                  onClick={handleDisburseNFTs}
-                  disabled={loadingNFT}
-                  className="flex-1 flex items-center justify-center gap-2 bg-transparent hover:bg-gray-100 text-black font-bold py-2 px-4 border border-black"
-                >
-                  {loadingNFT ? <Loader2 className="animate-spin" /> : <Award />}
-                  Disburse NFTs
-                </button>
-
-                <button
-                  onClick={handleDisburseTokens}
-                  disabled={loadingToken}
-                  className="flex-1 flex items-center justify-center gap-2 bg-transparent hover:bg-gray-100 text-black font-bold py-2 px-4 border border-black"
-                >
-                  {loadingToken ? <Loader2 className="animate-spin" /> : <Coins />}
-                  Disburse Tokens
-                </button>
-              </div>
-            </div> */}
 
             <div className="mt-4 space-y-2 text-center">
               <h3 className="font-semibold">Contributors</h3>

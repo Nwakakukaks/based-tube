@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { WalletSelector } from "./WalletSelector";
 import { Button } from "../ui/button";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export function Header() {
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ export function Header() {
               Login
             </Button>
           ) : (
-            <WalletSelector />
+            <ConnectButton />
           )}
         </div>
       </div>
