@@ -54,7 +54,6 @@
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "@coinbase/onchainkit": "^0.33.6",
-    "next": "^14.2.5",
     "permissionless": "^0.1.26",
     "siwe": "^2.3.2"
   },
