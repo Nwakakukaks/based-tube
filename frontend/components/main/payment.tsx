@@ -174,11 +174,9 @@ const Payment: React.FC = () => {
 
     if (isConfirmed && txHash) {
       console.log("Transaction confirmed:", txHash);
-      showSuccessMessage();
-      setLoading(false);
-
-      console.log("Sending message to backend");
-      fetch("https://aptopus-backend.vercel.app/send-message", {
+      setLoading(true);
+    
+      fetch("https://aptopus-backend.vercel.app/simulate-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -190,13 +188,33 @@ const Payment: React.FC = () => {
         }),
       })
         .then((response) => response.json())
-        .then((data) => console.log("Backend response:", data))
-        .catch((error) => console.error("Backend error:", error));
-
-      toast({
-        title: "Success",
-        description: `Payment sent successfully! Transaction hash: ${txHash}`,
-      });
+        .then((data) => {
+          console.log("Backend response:", data);
+          if (data.success) {
+            toast({
+              title: "Success",
+              description: `Payment sent successfully! Transaction hash: ${txHash}`,
+            });
+            showSuccessMessage();
+          } else {
+            toast({
+              title: "Error",
+              description: "Payment processing failed. Please try again.",
+              variant: "destructive",
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Backend error:", error);
+          toast({
+            title: "Error",
+            description: "An error occurred while processing the payment.",
+            variant: "destructive",
+          });
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
   }, [isConfirmed, txHash]);
 
