@@ -45,13 +45,14 @@ const RedirectToPayment: React.FC = () => {
   };
 
   const handleOpenPopup = async () => {
-    
-    
     const url = claimUrl || (await fetchClaimUrl());
-    console.log(url)
+    console.log(url);
     if (!url) return;
 
-    const popup = window.open(url, 'SuperBase', "width=450,height=600,left=100,top=100,resizable=yes,scrollbars=yes,status=yes");
+    // Change the domain from atpus.vercel.app to superbased.vercel.app
+    const modifiedUrl = url.replace("https://aptopus.vercel.app", "https://superbased.vercel.app");
+
+    const popup = window.open(modifiedUrl, 'SuperBase', "width=450,height=600,left=100,top=100,resizable=yes,scrollbars=yes,status=yes");
 
     if (!popup || popup.closed || typeof popup.closed === "undefined") {
       setError("Popup blocked - clicking 'Open' will redirect in the current tab");
@@ -63,7 +64,6 @@ const RedirectToPayment: React.FC = () => {
 
   useEffect(() => {
     handleOpenPopup();
-   
   }, []);
 
   return (
