@@ -25,7 +25,7 @@ const Creator: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-white mb-3 text-lg font-medium">Create Your Membership Token</p>
+              <p className="text-white mb-3 text-lg font-medium">Create Your Membership NFT</p>
               <p className="text-gray-400 text-sm">
                 Create a membership token to reward contributors granting them access to exclusive content and perks
                 across all your platforms.
@@ -59,7 +59,7 @@ const Creator: React.FC = () => {
 
   const steps = [
     { title: "", content: <BeginSetup /> },
-    { title: "Create a membership token", content: <DynamicMint /> },
+    { title: "Create a membership NFT", content: <DynamicMint /> },
   ];
 
   const handleProceed = () => {

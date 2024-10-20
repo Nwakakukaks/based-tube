@@ -16,7 +16,7 @@ export function LFooter() {
           <div>
             <p className="text-blue-500 font-semibold text-lg">SuperBase</p>
             <p className="text-xs text-gray-500 w-48 lg:w-96">
-              Create unique links to receive Aptos tokens from your viewers during live streams.
+              Create unique links to receive ETH tokens from your viewers during live streams.
             </p>
           </div>
           <div className="flex space-x-3 items-center">
