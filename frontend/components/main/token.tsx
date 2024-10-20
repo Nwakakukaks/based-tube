@@ -16,9 +16,7 @@ const ABI = abi;
 const DynamicMint = () => {
   const location = useLocation();
   const [videoId] = useState(new URLSearchParams(window.location.search).get("vid") || "");
-  const [creatorAddress] = useState(
-    new URLSearchParams(window.location.search).get("lnaddr") || "",
-  );
+  const [creatorAddress] = useState(new URLSearchParams(window.location.search).get("lnaddr") || "");
   const { address } = useAccount();
 
   const [formData, setFormData] = useState({
@@ -340,7 +338,7 @@ const DynamicMint = () => {
             onClick={onCreateNFT}
             disabled={isCreateNFTLoading || loading}
             className={`w-full text-lg mt-4 ${
-              isCreateNFTLoading ? "bg-gradient-to-r from-red-500 to-white animate-pulse" : success ? "" : ""
+              isCreateNFTLoading ? "bg-gradient-to-r from-blue-500 to-white animate-pulse" : success ? "" : ""
             } text-black bg-slate-50 hover:bg-slate-50 font-bold py-2 px-4 rounded`}
           >
             {isCreateNFTLoading ? "Processing..." : success ? "✓ Done!" : "Create NFT"}
@@ -361,12 +359,12 @@ const DynamicMint = () => {
                     <p className="text-base font-semibold text-gray-100">
                       {ownsAnyUTK ? "1" : "0"} / {totalSupply?.toString()}
                     </p>
-                    <p className="text-xs text-gray-400">Minted / Max Supply</p>
+                    <p className="text-xs text-gray-400">Minted/Max Supply</p>
                   </div>
                   <div>
-                    <p className="font-medium text-sm text-gray-400">Owns NFT </p>
+                    <p className="font-medium text-sm text-gray-400">Your Wallet</p>
                     <p className="text-base font-semibold text-gray-100">{ownsAnyUTK ? "Yes" : "No"}</p>
-                    <p className="text-xs text-gray-400">Wallet holdings</p>
+                    <p className="text-xs text-gray-400"> NFT available</p>
                   </div>
                 </div>
               </div>
@@ -377,7 +375,7 @@ const DynamicMint = () => {
                   onClick={onClaimNFT}
                   disabled={isClaimNFTLoading}
                   className={`w-full ${
-                    isClaimNFTLoading ? "bg-gradient-to-r from-red-500 to-white animate-pulse" : success ? "" : ""
+                    isClaimNFTLoading ? "bg-gradient-to-r from-blue-500 to-white animate-pulse" : success ? "" : ""
                   } text-black text-base font-bold py-1 px-4 rounded border border-black`}
                 >
                   {isClaimNFTLoading
@@ -394,7 +392,7 @@ const DynamicMint = () => {
                 <div className="bg-white text-gray-900 rounded-md p-2 mt-4">
                   <p className="text-sm text-wrap">
                     Hurray! Unlock creator's exclusive content here:{" "}
-                    <a href={generatedUrl} className="text-red-500 text-xs">
+                    <a href={generatedUrl} className="text-blue-500 text-xs">
                       {generatedUrl}
                     </a>
                   </p>

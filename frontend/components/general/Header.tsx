@@ -25,7 +25,7 @@ export function Header() {
       <div></div>
     ) : (
       <>
-        <div className="w-full bg-red-50 p-1">
+        <div className="w-full bg-blue-50 p-1">
           <p className="text-xs text-center text-black">
             We appreciate you exploring our beta! Your feedback helps us grow and improve.
           </p>

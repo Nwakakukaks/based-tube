@@ -5,6 +5,7 @@ import { toast } from "../ui/use-toast";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { parseEther } from "viem";
 import { paymentContract, paymentAbi } from "@/constants";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const Payment: React.FC = () => {
   const { address } = useAccount();
@@ -201,36 +202,42 @@ const Payment: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-3 justify-center items-center mx-auto h-[75vh]">
-      <div className={`bg-white rounded-lg shadow-md px-6 py-12 w-[85%]`}>
-        <h1 className="text-2xl text-blue-600">Superbase </h1>
-        <Input
-          name="message"
-          placeholder="Enter your Superchat message"
-          type="text"
-          maxLength={220}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          className="w-full border rounded p-2 mt-2 mb-4 text-gray-800"
-        />
-        <Input
-          name="amount"
-          placeholder="Amount in ETH"
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          className="w-full border rounded p-2 mt-2 mb-4 text-gray-800"
-        />
-        <Button
-          id="send-superchat-button"
-          onClick={sendSuperBase}
-          disabled={loading || isConfirming}
-          className={`w-full bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded p-2 transition-all duration-300 ${
-            loading || isConfirming ? "opacity-70 cursor-not-allowed" : ""
-          }`}
-        >
-          {loading || isConfirming ? "Sending..." : "Send Superchat"}
-        </Button>
-      </div>
+      {!address ? (
+        <div className="">
+          <ConnectButton />
+        </div>
+      ) : (
+        <div className={`bg-white rounded-lg shadow-md px-6 py-12 w-[85%]`}>
+          <h1 className="text-2xl text-blue-600">Superbase </h1>
+          <Input
+            name="message"
+            placeholder="Enter your Superchat message"
+            type="text"
+            maxLength={220}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            className="w-full border rounded p-2 mt-2 mb-4 text-gray-800"
+          />
+          <Input
+            name="amount"
+            placeholder="Amount in ETH"
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="w-full border rounded p-2 mt-2 mb-4 text-gray-800"
+          />
+          <Button
+            id="send-superchat-button"
+            onClick={sendSuperBase}
+            disabled={loading || isConfirming}
+            className={`w-full bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded p-2 transition-all duration-300 ${
+              loading || isConfirming ? "opacity-70 cursor-not-allowed" : ""
+            }`}
+          >
+            {loading || isConfirming ? "Sending..." : "Send Superchat"}
+          </Button>
+        </div>
+      )}
 
       {successMessage && (
         <div className="bg-white text-gray-900 rounded-md p-2 mt-1 w-[90%]">
