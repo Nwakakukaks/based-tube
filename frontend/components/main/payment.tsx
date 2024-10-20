@@ -2,108 +2,77 @@ import React, { useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { toast } from "../ui/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { parseEther } from "viem";
+import { paymentContract, paymentAbi } from "@/constants";
 
 const Payment: React.FC = () => {
-  const queryClient = useQueryClient();
+  const { address } = useAccount();
+  const { writeContract, data: txHash } = useWriteContract();
   const [message, setMessage] = useState("");
   const [amount, setAmount] = useState("");
   const [generatedUrl, setGeneratedUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const [videoId, setVideoId] = useState(new URLSearchParams(window.location.search).get("vid") || "");
-  const [address, setAddress] = useState(new URLSearchParams(window.location.search).get("lnaddr") || "");
+  const [videoId] = useState(new URLSearchParams(window.location.search).get("vid") || "");
+  const [recipientAddress] = useState(new URLSearchParams(window.location.search).get("lnaddr") || "");
+
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash: txHash,
+  });
 
   const sendSuperchat = async () => {
-    if (message && amount) {
-      setLoading(true);
-
-      try {
-        const response = await fetch("/api/send-message", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message,
-            amount: parseInt(amount),
-            videoId,
-            address: new URLSearchParams(window.location.search).get("lnaddr"),
-          }),
-        });
-        const data = await response.json();
-
-        if (data.error) {
-          alert(data.error);
-        } else {
-          await submitPayment();
-        }
-      } catch (error) {
-        alert("Error. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
-  const submitPayment = async () => {
-    setLoading(true);
-
-    const address = new URLSearchParams(window.location.search).get("lnaddr");
-    const transferAmount = Math.floor(parseFloat(amount) * Math.pow(10, 8)); // Use parseFloat
-
-    if (isNaN(transferAmount) || transferAmount <= 0) {
+    if (!address) {
       toast({
-        title: "Wrong number format",
-        description: "Please enter a valid number",
+        title: "Error",
+        description: "Please connect your wallet",
       });
-      setLoading(false);
       return;
     }
 
-    try {
-      if (videoId) {
-        // Simulate the payment
-        const response = await fetch("/api/simulate-payment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message,
-            amount,
-            videoId,
-            address,
-          }),
-        });
+    if (message && amount && recipientAddress) {
+      setLoading(true);
 
-        const data = await response.json();
-        if (data.success) {
-          showSuccessMessage();
-        }
-      } else {
+      try {
+        const amountInWei = parseEther(amount);
+
+        await writeContract({
+          address: paymentContract,
+          abi: paymentAbi,
+          functionName: "payment",
+          args: [recipientAddress],
+          value: amountInWei,
+        });
+      } catch (error) {
+        console.error("Error sending payment:", error);
         toast({
           title: "Error",
-          description: "Transaction failed. Please try again.",
+          description: "Failed to send payment. Please try again.",
         });
+        setLoading(false);
       }
-    } catch (error) {
-      alert("Error simulating payment. Please try again.");
-    } finally {
-      setLoading(false);
+    } else {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+      });
     }
   };
 
   const showSuccessMessage = async () => {
     await generateClaimUrl();
-    setSuccessMessage(`Your Superchat has been posted to YouTube.\nMessage: ${message}\nAmount: ${amount} APTO`);
+    setSuccessMessage(`Your Superchat has been posted ⚡⚡`);
   };
 
   const generateClaimUrl = async () => {
-    if (videoId && address) {
+    if (videoId && recipientAddress) {
       try {
-        const response = await fetch("/api/generate-short-url", {
+        const response = await fetch("https://aptopus-backend.vercel.app/generate-short-url", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ videoId, address: address }),
+          body: JSON.stringify({ videoId, address: recipientAddress }),
         });
         const data = await response.json();
 
@@ -133,10 +102,36 @@ const Payment: React.FC = () => {
     }
   };
 
+  React.useEffect(() => {
+    if (isConfirmed && txHash) {
+      console.log("Transaction confirmed:", txHash);
+      showSuccessMessage();
+      setLoading(false);
+
+      // Send message to backend
+      fetch("https://aptopus-backend.vercel.app/send-message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message,
+          amount,
+          videoId,
+          address: recipientAddress,
+          hash: txHash,
+        }),
+      }).catch(console.error);
+
+      toast({
+        title: "Success",
+        description: `Payment sent successfully! Transaction hash: ${txHash}`,
+      });
+    }
+  }, [isConfirmed, txHash]);
+
   return (
-    <div className="flex justify-center items-center mx-auto h-[75vh]">
+    <div className="flex flex-col gap-3 justify-center items-center mx-auto h-[75vh]">
       <div className={`bg-white rounded-lg shadow-md px-6 py-12 w-[85%]`}>
-        <h1 className="text-2xl text-blue-600">SuperBase 🐙</h1>
+        <h1 className="text-2xl text-blue-600">Superbase </h1>
         <Input
           name="message"
           placeholder="Enter your Superchat message"
@@ -148,7 +143,7 @@ const Payment: React.FC = () => {
         />
         <Input
           name="amount"
-          placeholder="Amount in APTOS"
+          placeholder="Amount in ETH"
           type="number"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
@@ -157,22 +152,24 @@ const Payment: React.FC = () => {
         <Button
           id="send-superchat-button"
           onClick={sendSuperchat}
-          disabled={loading}
-          className={`w-full bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded p-2 transition-all duration-300 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
+          disabled={loading || isConfirming}
+          className={`w-full bg-gradient-to-br from-red-600 to-red-800 text-white rounded p-2 transition-all duration-300 ${
+            loading || isConfirming ? "opacity-70 cursor-not-allowed" : ""
+          }`}
         >
-          {loading ? "Sending..." : "Send Superchat"}
+          {loading || isConfirming ? "Sending..." : "Send Superchat"}
         </Button>
       </div>
 
       {successMessage && (
-        <div className="bg-white text-gray-900 rounded-md p-2 mt-4">
-          <h2 className="text-lg font-bold">Payment Successful!</h2>
+        <div className="bg-white text-gray-900 rounded-md p-2 mt-1 w-[90%]">
+          <h2 className="text-base font-semibold">Payment Successful!</h2>
           <p className="text-sm">{successMessage}</p>
-          <p className="text-sm">
-            Claim your reward token here: <a className="text-blue-500">{generatedUrl}</a>
-          </p>
-          <p className="text-sm">
-            Claim your reward token here: <a className="text-blue-500">{generatedUrl}</a>
+          <p className="text-xs mt-2">
+            Hurray! claim your token here:{" "}
+            <a href={generatedUrl} className="text-red-500">
+              {generatedUrl}
+            </a>
           </p>
         </div>
       )}
