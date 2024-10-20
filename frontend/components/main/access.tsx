@@ -3,6 +3,12 @@ import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Lock, Unlock } from "lucide-react";
+import { useAccount, useReadContract, useSignMessage } from "wagmi";
+import { Contract_Address, abi } from "@/constants";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+
+const CONTRACT_ADDRESS = Contract_Address;
+const ABI = abi;
 
 interface Platform {
   name: string;
@@ -38,6 +44,8 @@ const PlatformButton: React.FC<PlatformButtonProps> = ({ platform, onClick, isLo
 const Access: React.FC = () => {
   const [loadingStates, setLoadingStates] = useState<Record<string, string | null>>({});
   const [signedPlatform, setSignedPlatform] = useState<Platform | null>(null);
+  const { address } = useAccount();
+  const { signMessage } = useSignMessage();
 
   const platforms: Platform[] = [
     { name: "Patreon", requiredBalance: 1 },
@@ -47,6 +55,14 @@ const Access: React.FC = () => {
     { name: "Instagram", requiredBalance: 1 },
     { name: "Farcaster", requiredBalance: 1 },
   ];
+
+  // Read contract data to check if user owns any UTK tokens
+  const { data: ownsAnyUTK, refetch: refetchOwnsAnyUTK } = useReadContract({
+    address: CONTRACT_ADDRESS,
+    abi: ABI,
+    functionName: "ownsAnyUTK",
+    args: [address],
+  });
 
   const generateRandomString = (prefix: string, length: number = 8): string => {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -58,49 +74,83 @@ const Access: React.FC = () => {
   };
 
   useEffect(() => {
-    const checkBalanceAndGrant = async () => {
-      if (signedPlatform) {
-        const tokenBalance = 2 / Math.pow(10, 8);
+    if (signedPlatform && address) {
+      // Add a delay before checking access
+      const timer = setTimeout(() => {
+        checkAccessAndGrant(signedPlatform);
+      }, 3000); // 3 second delay
 
-        if (tokenBalance >= signedPlatform.requiredBalance) {
-          const passkey = generateRandomString(signedPlatform.name);
-          toast({
-            title: "Access Granted",
-            description: `You now have access to exclusive content on ${signedPlatform.name}! Your passkey: ${passkey}`,
-          });
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Access Denied",
-            description: `You need at least ${signedPlatform.requiredBalance} creator token to access ${signedPlatform.name} contents.`,
-          });
-        }
+      return () => clearTimeout(timer);
+    }
+  }, [signedPlatform, address]);
 
-        setLoadingStates((prev) => ({ ...prev, [signedPlatform.name]: null }));
-        setSignedPlatform(null);
+  const checkAccessAndGrant = async (platform: Platform) => {
+    try {
+      // Refetch the current token ownership status
+      await refetchOwnsAnyUTK();
+
+      if (ownsAnyUTK) {
+        const passkey = generateRandomString(platform.name);
+        toast({
+          title: "Access Granted",
+          description: `You now have access to exclusive content on ${platform.name}! Your passkey: ${passkey}`,
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Access Denied",
+          description: `You need to own a creator token to access ${platform.name} contents.`,
+        });
       }
-    };
 
-    checkBalanceAndGrant();
-  }, [signedPlatform]);
+      setLoadingStates((prev) => ({ ...prev, [platform.name]: null }));
+      setSignedPlatform(null);
+    } catch (error) {
+      console.error("Error checking access:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to verify token ownership",
+      });
+      setLoadingStates((prev) => ({ ...prev, [platform.name]: null }));
+    }
+  };
 
   const handleAccess = async (platform: Platform) => {
-    const message = "Search wallet holdings for creator token";
+    if (!address) {
+      toast({
+        variant: "destructive",
+        title: "Wallet Not Connected",
+        description: "Please connect your wallet to access exclusive content.",
+      });
+      return;
+    }
 
     setLoadingStates((prev) => ({ ...prev, [platform.name]: "accessing" }));
 
     try {
-      const data = 1
+      
+      // Sign message configuration
+      () =>
+        signMessage({
+          message: "I authorize checking my wallet for creator NFT ownership",
+        });
 
-      if (data) {
-        setLoadingStates((prev) => ({ ...prev, [platform.name]: "checking" }));
-        setSignedPlatform(platform);
-      }
+      // Set checking state after signature
+      setLoadingStates((prev) => ({ ...prev, [platform.name]: "checking" }));
+      setSignedPlatform(platform);
+
+      // Show loading toast
+      toast({
+        title: "Verifying Access",
+        description: "Please wait while we verify your token ownership...",
+      });
     } catch (error) {
+      console.error("Error during access request:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to verify wallet signature",
+        description: "Failed to process access request",
       });
       setLoadingStates((prev) => ({ ...prev, [platform.name]: null }));
     }
@@ -108,26 +158,33 @@ const Access: React.FC = () => {
 
   return (
     <div className="h-[75vh] flex justify-center items-center">
-      <Card className="w-full max-w-4xl mx-auto bg-transparent border-2 border-gray-400 ">
+      <Card className="w-full max-w-4xl mx-auto bg-transparent border-2 border-gray-400">
         <CardHeader>
           <CardTitle className="text-2xl text-slate-50 font-bold text-center mb-2">Access Exclusive Contents</CardTitle>
-          <CardDescription className="text-center text-base ">
+          <CardDescription className="text-center text-base">
             Connect your wallet to unlock premium content using your membership token
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {platforms.map((platform) => (
-              <PlatformButton
-                key={platform.name}
-                platform={platform}
-                onClick={() => handleAccess(platform)}
-                isLoading={!!loadingStates[platform.name]}
-                loadingState={loadingStates[platform.name]}
-              />
-            ))}
+
+        {!address ? (
+          <div className="flex justify-center my-24">
+            <ConnectButton />
           </div>
-        </CardContent>
+        ) : (
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {platforms.map((platform) => (
+                <PlatformButton
+                  key={platform.name}
+                  platform={platform}
+                  onClick={() => handleAccess(platform)}
+                  isLoading={!!loadingStates[platform.name]}
+                  loadingState={loadingStates[platform.name]}
+                />
+              ))}
+            </div>
+          </CardContent>
+        )}
       </Card>
     </div>
   );

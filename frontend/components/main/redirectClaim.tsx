@@ -46,7 +46,7 @@ const RedirectToClaim: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      {error ? <div className="text-blue-500 mb-4">{error}</div> : null}
+      {!isLoading && error ? <div className="text-blue-500 mb-4">{error}</div> : null}
 
       <p>Redirecting to claim page...</p>
     </div>

@@ -90,7 +90,7 @@ const Payment: React.FC = () => {
         toast({
           variant: "destructive",
           title: "Error",
-          description: `An error occurred: ${error}`,
+          description: `An error occurblue: ${error}`,
         });
       }
     } else {
@@ -153,7 +153,7 @@ const Payment: React.FC = () => {
           id="send-superchat-button"
           onClick={sendSuperchat}
           disabled={loading || isConfirming}
-          className={`w-full bg-gradient-to-br from-red-600 to-red-800 text-white rounded p-2 transition-all duration-300 ${
+          className={`w-full bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded p-2 transition-all duration-300 ${
             loading || isConfirming ? "opacity-70 cursor-not-allowed" : ""
           }`}
         >
@@ -167,7 +167,7 @@ const Payment: React.FC = () => {
           <p className="text-sm">{successMessage}</p>
           <p className="text-xs mt-2">
             Hurray! claim your token here:{" "}
-            <a href={generatedUrl} className="text-red-500">
+            <a href={generatedUrl} className="text-blue-500">
               {generatedUrl}
             </a>
           </p>

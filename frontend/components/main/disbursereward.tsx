@@ -1,6 +1,5 @@
-import { useState } from "react";
+
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Loader2, CheckCircle2 } from "lucide-react";
 
 interface Transaction {
   amount: string;
@@ -12,7 +11,7 @@ interface Transaction {
 }
 
 const DisburseRewards = ({ videoId, transactions }: { videoId: string; transactions: Transaction[] }) => {
-  const [status, setStatus] = useState<{ [key: string]: "pending" | "success" | "error" }>({});
+ 
   const uniqueAddresses = Array.from(new Set(transactions.map((t) => t.address)));
   const totalContributions = transactions.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
 
@@ -45,13 +44,7 @@ const DisburseRewards = ({ videoId, transactions }: { videoId: string; transacti
               {uniqueAddresses.map((address) => (
                 <div key={address} className="flex items-center justify-between p-2 border border-gray-200">
                   <span className="font-mono text-sm">{address}</span>
-                  {status[address] && (
-                    <span className="flex items-center">
-                      {status[address] === "pending" && <Loader2 className="animate-spin h-4 w-4" />}
-                      {status[address] === "success" && <CheckCircle2 className="h-4 w-4 text-green-500" />}
-                      {status[address] === "error" && <p className=" text-blue-500 text-sm font-semibold">Failed </p>}
-                    </span>
-                  )}
+                
                 </div>
               ))}
             </div>
