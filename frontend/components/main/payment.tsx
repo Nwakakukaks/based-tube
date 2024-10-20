@@ -21,8 +21,18 @@ const Payment: React.FC = () => {
     hash: txHash,
   });
 
-  const sendSuperchat = async () => {
+  const sendSuperBase = async () => {
+    console.log("Starting sendSuperBase function");
+    console.log("Current state:", {
+      address,
+      message,
+      amount,
+      recipientAddress,
+      videoId,
+    });
+
     if (!address) {
+      console.error("Wallet not connected");
       toast({
         title: "Error",
         description: "Please connect your wallet",
@@ -30,28 +40,71 @@ const Payment: React.FC = () => {
       return;
     }
 
+    if (!recipientAddress) {
+      console.error("Recipient address is missing");
+      toast({
+        title: "Error",
+        description: "Recipient address is missing",
+      });
+      return;
+    }
+
+    if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
+      console.error("Invalid amount:", amount);
+      toast({
+        title: "Error",
+        description: "Please enter a valid amount",
+      });
+      return;
+    }
+
+    if (!message) {
+      console.error("Message is empty");
+      toast({
+        title: "Error",
+        description: "Please enter a message",
+      });
+      return;
+    }
+
     if (message && amount && recipientAddress) {
       setLoading(true);
+      console.log("Preparing transaction with params:", {
+        recipientAddress,
+        amount,
+        contract: paymentContract,
+      });
 
       try {
+        console.log("Converting amount to Wei:", amount);
         const amountInWei = parseEther(amount);
+        console.log("Amount in Wei:", amountInWei);
 
-        await writeContract({
+        console.log("Initiating contract write...");
+        const tx = await writeContract({
           address: paymentContract,
           abi: paymentAbi,
           functionName: "payment",
           args: [recipientAddress],
           value: amountInWei,
         });
+
+        console.log("Transaction initiated:", tx);
       } catch (error) {
-        console.error("Error sending payment:", error);
-        toast({
-          title: "Error",
-          description: "Failed to send payment. Please try again.",
+        console.error("Detailed error in sending payment:", {
+          error,
+          errorMessage: error,
+          errorCode: error,
         });
+
         setLoading(false);
       }
     } else {
+      console.log("Validation failed:", {
+        hasMessage: !!message,
+        hasAmount: !!amount,
+        hasRecipient: !!recipientAddress,
+      });
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -60,13 +113,17 @@ const Payment: React.FC = () => {
   };
 
   const showSuccessMessage = async () => {
+    console.log("Showing success message");
     await generateClaimUrl();
     setSuccessMessage(`Your Superchat has been posted ⚡⚡`);
   };
 
   const generateClaimUrl = async () => {
+    console.log("Generating claim URL for:", { videoId, recipientAddress });
+
     if (videoId && recipientAddress) {
       try {
+        console.log("Making API request to generate short URL");
         const response = await fetch("https://aptopus-backend.vercel.app/generate-short-url", {
           method: "POST",
           headers: {
@@ -75,8 +132,10 @@ const Payment: React.FC = () => {
           body: JSON.stringify({ videoId, address: recipientAddress }),
         });
         const data = await response.json();
+        console.log("API response:", data);
 
         if (data.error) {
+          console.error("API returned error:", data.error);
           toast({
             variant: "destructive",
             title: "Error",
@@ -84,31 +143,40 @@ const Payment: React.FC = () => {
           });
         } else {
           const claimUrl = `${window.location.origin}/c/${data.shortCode}`;
+          console.log("Generated claim URL:", claimUrl);
           setGeneratedUrl(claimUrl);
         }
       } catch (error) {
+        console.error("Error generating claim URL:", error);
         toast({
           variant: "destructive",
           title: "Error",
-          description: `An error occurblue: ${error}`,
+          description: `An error occurred: ${error}`,
         });
       }
     } else {
+      console.error("Missing required parameters:", { videoId, recipientAddress });
       toast({
         variant: "default",
         title: "Claim Link Error",
-        description: "Failed to generate Claim Link",
+        description: "Failed to generate Claim Link - Missing parameters",
       });
     }
   };
 
   React.useEffect(() => {
+    console.log("Transaction status changed:", {
+      isConfirmed,
+      txHash,
+      isConfirming,
+    });
+
     if (isConfirmed && txHash) {
       console.log("Transaction confirmed:", txHash);
       showSuccessMessage();
       setLoading(false);
 
-      // Send message to backend
+      console.log("Sending message to backend");
       fetch("https://aptopus-backend.vercel.app/send-message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -119,7 +187,10 @@ const Payment: React.FC = () => {
           address: recipientAddress,
           hash: txHash,
         }),
-      }).catch(console.error);
+      })
+        .then((response) => response.json())
+        .then((data) => console.log("Backend response:", data))
+        .catch((error) => console.error("Backend error:", error));
 
       toast({
         title: "Success",
@@ -151,7 +222,7 @@ const Payment: React.FC = () => {
         />
         <Button
           id="send-superchat-button"
-          onClick={sendSuperchat}
+          onClick={sendSuperBase}
           disabled={loading || isConfirming}
           className={`w-full bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded p-2 transition-all duration-300 ${
             loading || isConfirming ? "opacity-70 cursor-not-allowed" : ""

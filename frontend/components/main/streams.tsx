@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import transactionsData from "../../../chatbot/validTransactions.json"; // Update with your actual path
 import DisburseRewards from "./disbursereward";
+import { useAccount } from "wagmi";
 
 interface Transaction {
   amount: string;
@@ -10,7 +10,6 @@ interface Transaction {
   transactionHash: string;
   message: string;
 }
-
 
 // Group transactions by video ID
 const groupTransactionsByVideoId = (transactions: Transaction[]) => {
@@ -26,43 +25,54 @@ const groupTransactionsByVideoId = (transactions: Transaction[]) => {
 const Streams: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [groupedStreams, setGroupedStreams] = useState<Record<string, Transaction[]>>({});
+  const { address } = useAccount();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const groupedData = groupTransactionsByVideoId(transactionsData);
-      setGroupedStreams(groupedData);
-      setLoading(false);
-    }, 2000);
+    const fetchTransactions = async () => {
+      try {
+        const response = await fetch("https://aptopus-backend.vercel.app/valid-transactions"); // Adjust the URL if needed
+        if (!response.ok) {
+          throw new Error("Failed to fetch transactions");
+        }
+        const data: Transaction[] = await response.json();
 
-    return () => clearTimeout(timer);
-  }, []);
+        // Filter transactions by address
+        const filteredData = data.filter((transaction) => transaction.address === address);
 
+        const groupedData = groupTransactionsByVideoId(filteredData);
+        setGroupedStreams(groupedData);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    if (address) {
+      fetchTransactions();
+    }
+  }, [address]);
 
   return (
+    <div className="mt-6 text-gray-100 p-4 rounded shadow overflow-y-auto h-[100vh]">
+      <h2 className="text-xl">Past Streams</h2>
 
-      <div className=" mt-6 text-gray-100 p-4 rounded shadow overflow-y-auto h-[100vh]">
-        <h2 className="text-xl">Past Streams</h2>
+      {loading && <div className="loading-indicator text-center mt-4">Loading...</div>}
 
-        {loading && <div className="loading-indicator text-center mt-4">Loading...</div>}
+      {!loading && Object.keys(groupedStreams).length === 0 && (
+        <div className="no-data text-center mt-4">No past streams found.</div>
+      )}
 
-        {!loading && Object.keys(groupedStreams).length === 0 && (
-          <div className="no-data text-center mt-4">No past streams found.</div>
-        )}
-
-        {!loading && Object.keys(groupedStreams).length > 0 && (
-          <div className="mt-4">
-            {Object.entries(groupedStreams).map(([videoId, transactions]) => {
-              return (
-                <div key={videoId} className="mb-4">
-                  <DisburseRewards videoId={videoId} transactions={transactions} />
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-   
+      {!loading && Object.keys(groupedStreams).length > 0 && (
+        <div className="mt-4">
+          {Object.entries(groupedStreams).map(([videoId, transactions]) => (
+            <div key={videoId} className="mb-4">
+              <DisburseRewards videoId={videoId} transactions={transactions} />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 
